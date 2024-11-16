@@ -17,7 +17,6 @@ import java.util.List;
 @Table(name = "sub_topic")
 public class SubTopic extends BaseEntity {
     private String name;
-    private String imageUrl;
     private String blobName;
     @ManyToOne
     @JoinColumn(name = "main_topic_id")

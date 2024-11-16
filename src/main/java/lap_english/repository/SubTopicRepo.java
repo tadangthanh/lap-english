@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface SubTopicRepo extends JpaRepository<SubTopic, Long> {
     @Query("SELECT s FROM SubTopic s WHERE s.mainTopic.id = ?1")
     Page<SubTopic> findByMainTopicId(Long mainTopicId, Pageable pageable);
+    @Query("SELECT CASE WHEN COUNT(sp) > 0 THEN TRUE ELSE FALSE END FROM SubTopic sp WHERE lower(sp.name) = lower(?1)")
+    boolean existsByName(String name);
 }

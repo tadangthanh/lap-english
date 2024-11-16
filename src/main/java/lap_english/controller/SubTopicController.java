@@ -5,6 +5,7 @@ import lap_english.dto.SubTopicDto;
 import lap_english.dto.response.ResponseData;
 import lap_english.service.ISubTopicService;
 import lap_english.validation.Create;
+import lap_english.validation.Update;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +20,7 @@ public class SubTopicController {
     private final ISubTopicService subTopicService;
 
     @PostMapping
-    public ResponseData<?> createSubTopic(@RequestPart("subTopicDto") @Validated(Create.class) SubTopicDto subTopicDto, @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseData<?> createSubTopic(@RequestPart("data") @Validated(Create.class) SubTopicDto subTopicDto, @RequestPart(value = "file", required = false) MultipartFile file) {
         subTopicDto.setFile(file);
         return new ResponseData<>(HttpStatus.CREATED.value(), "success", subTopicService.create(subTopicDto));
     }
@@ -27,12 +28,13 @@ public class SubTopicController {
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteSubTopic(@PathVariable Long id) {
         subTopicService.delete(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "success", null);
+        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
 
     @PutMapping("/{id}")
-    public ResponseData<?> updateSubTopic(@PathVariable Long id, @Validated @RequestBody SubTopicDto subTopicDto) {
+    public ResponseData<?> updateSubTopic(@PathVariable Long id, @RequestPart("data") @Validated(Update.class) SubTopicDto subTopicDto, @RequestPart(value = "file", required = false) MultipartFile file) {
         subTopicDto.setId(id);
+        subTopicDto.setFile(file);
         return new ResponseData<>(HttpStatus.OK.value(), "success", subTopicService.update(subTopicDto));
     }
 

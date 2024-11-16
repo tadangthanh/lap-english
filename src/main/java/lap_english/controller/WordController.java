@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +20,8 @@ public class WordController {
     private final IWordService wordService;
 
     @PostMapping
-    public ResponseData<?> create(@Validated(Create.class) @RequestBody WordDto wordDto) {
+    public ResponseData<?> create(@Validated(Create.class) @RequestPart("data") WordDto wordDto, @RequestPart(value = "file", required = false) MultipartFile file) {
+        wordDto.setFile(file);
         return new ResponseData<>(HttpStatus.CREATED.value(), "success", wordService.create(wordDto));
     }
 

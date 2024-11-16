@@ -1,6 +1,7 @@
 package lap_english.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lap_english.entity.WordLevel;
@@ -10,6 +11,7 @@ import lap_english.validation.Update;
 import lap_english.validation.ValidEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -33,5 +35,13 @@ public class WordDto extends BaseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotNull(message = "subTopicId is required", groups = Create.class)
     private Long subTopicId;
-
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String audioUkBlobName;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String audioUsBlobName;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String imageBlobName;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private MultipartFile file;
 }

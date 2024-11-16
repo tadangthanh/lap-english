@@ -14,6 +14,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 public interface WordMapper {
     @Mapping(target = "subTopicName", source = "subTopic.name")
     @Mapping(target = "subTopicId", source = "subTopic.id")
+    @Mapping(target = "imageBlobName", source = "imageBlobName")
     WordDto toDto(Word entity);
 
     Word toEntity(WordDto dto);

@@ -18,6 +18,7 @@ target/
 *.iml
 *.ipr
 .env
+lapenglish-texttospeech.json
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -34,7 +34,8 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final IUserService userDetailsService;
     private final JwtAuthenticationFilter preFilter;
     private final String[] WHITE_LIST = {
-            "/auth/**"
+            "/auth/**",
+            "/api/blob/**",
     };
     @Override
     public void addCorsMappings(CorsRegistry registry) {

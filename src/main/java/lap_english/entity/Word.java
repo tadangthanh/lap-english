@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "world")
+@Table(name = "word")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Word extends BaseEntity {
@@ -17,6 +17,9 @@ public class Word extends BaseEntity {
     private String meaning;
     private String pronounceUK;
     private String pronounceUS;
+    private String audioUkBlobName;
+    private String audioUsBlobName;
+    private String imageBlobName;
     @Enumerated(EnumType.STRING)
     private WordType type;
     @Enumerated(EnumType.STRING)
