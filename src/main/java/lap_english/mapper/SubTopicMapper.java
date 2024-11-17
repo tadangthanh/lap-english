@@ -14,6 +14,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 public interface SubTopicMapper {
     @Mapping(target = "mainTopicName", source = "mainTopic.name")
     @Mapping(target = "mainTopicId", source = "mainTopic.id")
+    @Mapping(target = "blobName", source = "blobName")
     SubTopicDto toDto(SubTopic entity);
 
     SubTopic toEntity(SubTopicDto dto);

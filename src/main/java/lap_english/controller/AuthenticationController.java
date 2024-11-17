@@ -28,14 +28,16 @@ public class AuthenticationController {
     public ResponseData<?> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
         return new ResponseData<>(HttpStatus.OK.value(), "refresh success", authenticationService.refreshToken(refreshToken));
     }
+
     @PostMapping("/logout")
     public String logout() {
         return "logout sucess";
     }
+
     @PostMapping({"/verify-token"})
     public ResponseData<?> verifyToken(@RequestHeader("Access-Token") String token) {
         this.authenticationService.verifyToken(token);
-       return  new ResponseData<>(HttpStatus.OK.value(),"Token is valid",null);
+        return new ResponseData<>(HttpStatus.OK.value(), "Token is valid", null);
     }
 }
 

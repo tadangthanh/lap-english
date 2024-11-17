@@ -12,12 +12,15 @@ import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.WordMapper;
 import lap_english.repository.SubTopicRepo;
 import lap_english.repository.WordRepo;
+import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IAzureService;
 import lap_english.service.IWordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -27,6 +30,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -117,5 +124,45 @@ public class WordServiceImpl implements IWordService {
                 .hasNext(wordPage.hasNext())
                 .pageNo(page)
                 .pageSize(size).build();
+    }
+
+    @Override
+    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] word) {
+        log.info("request get all of word with specification");
+        if (word != null && word.length > 0) {
+            EntitySpecificationsBuilder<Word> builder = new EntitySpecificationsBuilder<>();
+//            Pattern pattern = Pattern.compile("(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)");
+            Pattern pattern = Pattern.compile("([a-zA-Z0-9_.]+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)");
+            //patten chia ra thành 5 nhóm
+            // nhóm 1: từ cần tìm kiếm (có thể là tên cột hoặc tên bảng) , ví dụ: name, age, subTopic.id=> subTopic là tên bảng, id là tên cột
+            // nhóm 2: toán tử tìm kiếm
+            // nhóm 3: giá trị cần tìm kiếm
+            // nhóm 4: dấu câu cuối cùng
+            // nhóm 5: dấu câu cuối cùng
+            for (String s : word) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                }
+            }
+            Specification<Word> spec = builder.build();
+            // nó trả trả về 1 spec mới
+//            spec=spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("subTopic").get("id"), subTopicId));
+            Page<Word> wordPage = wordRepo.findAll(spec, pageable);
+
+            return convertToPageResponse(wordPage, pageable);
+        }
+        return convertToPageResponse(wordRepo.findAll(pageable), pageable);
+    }
+
+    private PageResponse<?> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
+        List<WordDto> response = wordPage.stream().map(this.wordMapper::toDto).collect(toList());
+        return PageResponse.builder()
+                .items(response)
+                .totalItems(wordPage.getTotalElements())
+                .totalPage(wordPage.getTotalPages())
+                .hasNext(wordPage.hasNext())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize()).build();
     }
 }

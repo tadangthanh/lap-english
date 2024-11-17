@@ -7,6 +7,7 @@ import lap_english.service.IWordService;
 import lap_english.validation.Create;
 import lap_english.validation.Update;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +38,10 @@ public class WordController {
         return new ResponseData<>(HttpStatus.OK.value(), "success", wordService.update(wordDto));
     }
 
-    @GetMapping("/sub-topic/{subtopicId}")
-    public ResponseData<?> getBySubTopic(@PathVariable("subtopicId") Long subtopicId,
-                                         @Min(0) @RequestParam(defaultValue = "0") int page,
-                                         @Min(1) @RequestParam(defaultValue = "10") int size) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.getBySubTopicId(subtopicId, page, size));
+    @GetMapping
+    public ResponseData<?> getBySubTopic(Pageable pageable,
+                                          @RequestParam(required = false, value = "word") String[] word) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.advanceSearchBySpecification(pageable,word));
     }
 
 }

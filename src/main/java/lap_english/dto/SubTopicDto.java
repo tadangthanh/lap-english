@@ -15,11 +15,10 @@ public class SubTopicDto extends BaseDto {
     @NotBlank(message = "Name is required", groups = {Create.class, Update.class})
     private String name;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String imageUrl;
+    private String blobName;
     @NotBlank(message = "mainTopicName is required")
     private String mainTopicName;
     @NotNull(message = "mainTopicId is required", groups = {Create.class})
     private Long mainTopicId;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MultipartFile file;
+    private int wordCount;
 }

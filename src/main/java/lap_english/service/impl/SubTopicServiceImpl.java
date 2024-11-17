@@ -10,12 +10,16 @@ import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.SubTopicMapper;
 import lap_english.repository.MainTopicRepo;
 import lap_english.repository.SubTopicRepo;
+import lap_english.repository.WordRepo;
+import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IAzureService;
 import lap_english.service.ISubTopicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -23,6 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -33,15 +41,16 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private final SubTopicRepo subTopicRepo;
     private final MainTopicRepo mainTopicRepo;
     private final IAzureService azureService;
+    private final WordRepo wordRepo;
 
     @Override
-    public SubTopicDto create(SubTopicDto subTopicDto) {
+    public SubTopicDto create(SubTopicDto subTopicDto, MultipartFile file) {
         validateSubTopic(subTopicDto);
         MainTopic mainTopic = getMainTopicById(subTopicDto.getMainTopicId());
         SubTopic subTopic = subTopicMapper.toEntity(subTopicDto);
         subTopic.setMainTopic(mainTopic);
         subTopic = subTopicRepo.save(subTopic);
-        uploadImage(subTopicDto.getFile(), subTopic);
+        uploadImage(file, subTopic);
         return subTopicMapper.toDto(subTopic);
     }
 
@@ -86,7 +95,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         });
     }
 
-    public SubTopicDto update(SubTopicDto subTopicDto) {
+    public SubTopicDto update(SubTopicDto subTopicDto, MultipartFile file) {
         SubTopic subTopicExist = subTopicRepo.findById(subTopicDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
 
@@ -113,9 +122,11 @@ public class SubTopicServiceImpl implements ISubTopicService {
             }
         });
 
-        uploadImage(subTopicDto.getFile(), subTopicExist);
+        uploadImage(file, subTopicExist);
         // Sau khi lưu thành công, trả về DTO
-        return subTopicMapper.toDto(subTopicExist);
+        SubTopicDto result = subTopicMapper.toDto(subTopicExist);
+        result.setWordCount(wordRepo.countBySubTopicId(subTopicExist.getId()));
+        return result;
     }
 
     void deleteFile(String blobName) {
@@ -125,10 +136,13 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     @Override
-    public PageResponse<?> getAll(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+    public PageResponse<?> getPage(int page, int size, String sort) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort.equals("asc") ? Sort.by("name").ascending() : Sort.by("name").descending());
         Page<SubTopic> subTopicPage = subTopicRepo.findAll(pageRequest);
         List<SubTopicDto> subTopicDtos = subTopicMapper.toListDto(subTopicPage.getContent());
+        subTopicDtos.forEach(subTopicDto -> {
+            subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
+        });
         return PageResponse.builder()
                 .items(subTopicDtos)
                 .totalItems(subTopicPage.getTotalElements())
@@ -150,5 +164,56 @@ public class SubTopicServiceImpl implements ISubTopicService {
                 .hasNext(subTopicPage.hasNext())
                 .pageNo(page)
                 .pageSize(size).build();
+    }
+
+    @Override
+    public PageResponse<?> findByName(String name, int page, int size, String sort) {
+        PageRequest pageRequest = PageRequest.of(page, size, sort.equals("asc") ? Sort.by("name").ascending() : Sort.by("name").descending());
+        Page<SubTopic> subTopicPage = subTopicRepo.findByNameContaining(name, pageRequest);
+        List<SubTopicDto> subTopicDtos = subTopicMapper.toListDto(subTopicPage.getContent());
+        subTopicDtos.forEach(subTopicDto -> {
+            subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
+        });
+        return PageResponse.builder()
+                .items(subTopicDtos)
+                .totalItems(subTopicPage.getTotalElements())
+                .totalPage(subTopicPage.getTotalPages())
+                .hasNext(subTopicPage.hasNext())
+                .pageNo(page)
+                .pageSize(size).build();
+    }
+
+    @Override
+    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] subTopic) {
+        log.info("request get all of sub topic with specification");
+        if (subTopic != null && subTopic.length > 0) {
+            EntitySpecificationsBuilder<SubTopic> builder = new EntitySpecificationsBuilder<SubTopic>();
+            Pattern pattern = Pattern.compile("(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)"); //?page=0&size=10&sort=id,desc&subtopic=name~d
+            for (String s : subTopic) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                }
+            }
+
+            Page<SubTopic> subTopicPage = subTopicRepo.findAll(builder.build(), pageable);
+
+            return convertToPageResponse(subTopicPage, pageable);
+        }
+        return convertToPageResponse(subTopicRepo.findAll(pageable), pageable);
+    }
+
+    private PageResponse<?> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
+        List<SubTopicDto> response = subTopicPage.stream().map(this.subTopicMapper::toDto).collect(toList());
+        response.forEach(subTopicDto -> {
+            subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
+        });
+        return PageResponse.builder()
+                .items(response)
+                .totalItems(subTopicPage.getTotalElements())
+                .totalPage(subTopicPage.getTotalPages())
+                .hasNext(subTopicPage.hasNext())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize()).build();
     }
 }
