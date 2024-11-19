@@ -2,9 +2,7 @@ package lap_english.service.impl;
 
 import com.google.cloud.texttospeech.v1.SsmlVoiceGender;
 import jakarta.transaction.Transactional;
-import lap_english.dto.SubTopicDto;
 import lap_english.dto.WordDto;
-import lap_english.dto.response.BlobResponse;
 import lap_english.dto.response.PageResponse;
 import lap_english.entity.SubTopic;
 import lap_english.entity.Word;
@@ -28,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -48,7 +47,36 @@ public class WordServiceImpl implements IWordService {
 
     @Override
     public void delete(Long id) {
+        Word wordExisting = wordRepo.findById(id).orElseThrow(() -> {
+            log.error("Word not found");
+            return new ResourceNotFoundException("Word not found");
+        });
+        List<String> blobNames = getListBlobWord(List.of(wordExisting));
         wordRepo.deleteById(id);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_COMMITTED) {
+                    blobNames.forEach(blobName -> deleteFileByBlobName(blobName));
+                }
+            }
+        });
+    }
+
+    private List<String> getListBlobWord(List<Word> words) {
+        List<String> blobNames = new ArrayList<>();
+        for (Word word : words) {
+            if (word.getAudioUkBlobName() != null) {
+                blobNames.add(word.getAudioUkBlobName());
+            }
+            if (word.getAudioUsBlobName() != null) {
+                blobNames.add(word.getAudioUsBlobName());
+            }
+            if (word.getImageBlobName() != null) {
+                blobNames.add(word.getImageBlobName());
+            }
+        }
+        return blobNames;
     }
 
     @Override
@@ -70,10 +98,15 @@ public class WordServiceImpl implements IWordService {
         word.setImageBlobName(azureService.upload(file));
     }
 
-    void deleteFile(String blobName) {
+    void deleteFileByBlobName(String blobName) {
         if (blobName != null && !blobName.isEmpty()) {
             azureService.deleteBlob(blobName);
         }
+    }
+
+    private void uploadDoubleAudioUsUk(Word word) {
+        uploadAudio(word, "en-GB", SsmlVoiceGender.FEMALE);
+        uploadAudio(word, "en-US", SsmlVoiceGender.MALE);
     }
 
     private void uploadAudio(Word word, String languageCode, SsmlVoiceGender gender) {
@@ -108,8 +141,28 @@ public class WordServiceImpl implements IWordService {
             log.error("Word not found");
             return new ResourceNotFoundException("Word not found");
         });
+        List<String> blobNames = getListBlobWord(List.of(wordExist));
+
         wordMapper.updateEntityFromDto(dto, wordExist);
-        return wordMapper.toDto(wordRepo.save(wordExist));
+        wordExist = wordRepo.save(wordExist);
+        Word finalWordExist = wordExist;
+        // xóa file cũ và upload file mới sau khi commit transaction
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                blobNames.forEach(blobName -> deleteFileByBlobName(blobName));
+                uploadDoubleAudioUsUk(finalWordExist);
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) {
+                    // Thực hiện hành động khác nếu transaction không thành công
+                    log.error("Transaction rolled back, no file deletion.");
+                }
+            }
+        });
+        return wordMapper.toDto(wordRepo.save(finalWordExist));
     }
 
     @Override
@@ -117,13 +170,7 @@ public class WordServiceImpl implements IWordService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Word> wordPage = wordRepo.findBySubTopicId(subTopicId, pageRequest);
         List<WordDto> wordDtoList = wordMapper.toListDto(wordPage.getContent());
-        return PageResponse.builder()
-                .items(wordDtoList)
-                .totalItems(wordPage.getTotalElements())
-                .totalPage(wordPage.getTotalPages())
-                .hasNext(wordPage.hasNext())
-                .pageNo(page)
-                .pageSize(size).build();
+        return PageResponse.builder().items(wordDtoList).totalItems(wordPage.getTotalElements()).totalPage(wordPage.getTotalPages()).hasNext(wordPage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
@@ -155,14 +202,24 @@ public class WordServiceImpl implements IWordService {
         return convertToPageResponse(wordRepo.findAll(pageable), pageable);
     }
 
+    @Override
+    public void deleteBySubTopicId(Long subTopicId) {
+        List<Word> words = wordRepo.findAllBySubTopicId(subTopicId);
+        // Lấy ra tên của các file blob, sau khi commit thì xóa các file blob
+        List<String> blobNames = getListBlobWord(words);
+        wordRepo.deleteAll(words);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_COMMITTED) {
+                    blobNames.forEach(blobName -> deleteFileByBlobName(blobName));
+                }
+            }
+        });
+    }
+
     private PageResponse<?> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
         List<WordDto> response = wordPage.stream().map(this.wordMapper::toDto).collect(toList());
-        return PageResponse.builder()
-                .items(response)
-                .totalItems(wordPage.getTotalElements())
-                .totalPage(wordPage.getTotalPages())
-                .hasNext(wordPage.hasNext())
-                .pageNo(pageable.getPageNumber())
-                .pageSize(pageable.getPageSize()).build();
+        return PageResponse.builder().items(response).totalItems(wordPage.getTotalElements()).totalPage(wordPage.getTotalPages()).hasNext(wordPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }

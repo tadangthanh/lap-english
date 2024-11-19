@@ -14,6 +14,7 @@ import lap_english.repository.WordRepo;
 import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IAzureService;
 import lap_english.service.ISubTopicService;
+import lap_english.service.IWordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private final MainTopicRepo mainTopicRepo;
     private final IAzureService azureService;
     private final WordRepo wordRepo;
+    private final IWordService wordService;
 
     @Override
     public SubTopicDto create(SubTopicDto subTopicDto, MultipartFile file) {
@@ -74,10 +76,10 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     @Override
     public void delete(Long id) {
-        SubTopic subTopic = subTopicRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
+        SubTopic subTopic = subTopicRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
         String blobName = subTopic.getBlobName();
         subTopicRepo.delete(subTopic);
+        wordService.deleteBySubTopicId(id);
         // Đăng ký hành động xóa file sau khi transaction commit thành công
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -96,8 +98,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     public SubTopicDto update(SubTopicDto subTopicDto, MultipartFile file) {
-        SubTopic subTopicExist = subTopicRepo.findById(subTopicDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
+        SubTopic subTopicExist = subTopicRepo.findById(subTopicDto.getId()).orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
 
         // Lưu đường dẫn file cần xóa
         String blobName = subTopicExist.getBlobName();
@@ -110,7 +111,9 @@ public class SubTopicServiceImpl implements ISubTopicService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                deleteFile(blobName);
+               if(file!=null){
+                   deleteFile(blobName);
+               }
             }
 
             @Override
@@ -143,13 +146,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         subTopicDtos.forEach(subTopicDto -> {
             subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
         });
-        return PageResponse.builder()
-                .items(subTopicDtos)
-                .totalItems(subTopicPage.getTotalElements())
-                .totalPage(subTopicPage.getTotalPages())
-                .hasNext(subTopicPage.hasNext())
-                .pageNo(page)
-                .pageSize(size).build();
+        return PageResponse.builder().items(subTopicDtos).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
@@ -157,13 +154,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<SubTopic> subTopicPage = subTopicRepo.findByMainTopicId(mainTopicId, pageRequest);
         List<SubTopicDto> subTopicDtos = subTopicMapper.toListDto(subTopicPage.getContent());
-        return PageResponse.builder()
-                .items(subTopicDtos)
-                .totalItems(subTopicPage.getTotalElements())
-                .totalPage(subTopicPage.getTotalPages())
-                .hasNext(subTopicPage.hasNext())
-                .pageNo(page)
-                .pageSize(size).build();
+        return PageResponse.builder().items(subTopicDtos).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
@@ -174,13 +165,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         subTopicDtos.forEach(subTopicDto -> {
             subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
         });
-        return PageResponse.builder()
-                .items(subTopicDtos)
-                .totalItems(subTopicPage.getTotalElements())
-                .totalPage(subTopicPage.getTotalPages())
-                .hasNext(subTopicPage.hasNext())
-                .pageNo(page)
-                .pageSize(size).build();
+        return PageResponse.builder().items(subTopicDtos).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
@@ -203,17 +188,28 @@ public class SubTopicServiceImpl implements ISubTopicService {
         return convertToPageResponse(subTopicRepo.findAll(pageable), pageable);
     }
 
+    @Override
+    public void deleteByMainTopicId(Long mainTopicId) {
+        List<SubTopic> subTopics = subTopicRepo.findAllByMainTopicId(mainTopicId);
+        for (SubTopic subTopic : subTopics) {
+            wordService.deleteBySubTopicId(subTopic.getId());
+            subTopicRepo.delete(subTopic);
+        }
+    }
+
+    @Override
+    public SubTopicDto getById(Long id) {
+        SubTopic subTopic = subTopicRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
+        SubTopicDto subTopicDto = subTopicMapper.toDto(subTopic);
+        subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
+        return subTopicDto;
+    }
+
     private PageResponse<?> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
         List<SubTopicDto> response = subTopicPage.stream().map(this.subTopicMapper::toDto).collect(toList());
         response.forEach(subTopicDto -> {
             subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
         });
-        return PageResponse.builder()
-                .items(response)
-                .totalItems(subTopicPage.getTotalElements())
-                .totalPage(subTopicPage.getTotalPages())
-                .hasNext(subTopicPage.hasNext())
-                .pageNo(pageable.getPageNumber())
-                .pageSize(pageable.getPageSize()).build();
+        return PageResponse.builder().items(response).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }

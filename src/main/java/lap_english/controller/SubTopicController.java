@@ -53,5 +53,9 @@ public class SubTopicController {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", subTopicService.getByMainTopicId(mainTopicId, page, size));
     }
 
+    @GetMapping("/{id}")
+    public ResponseData<?> getById(@PathVariable Long id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully", subTopicService.getById(id));
+    }
 
 }

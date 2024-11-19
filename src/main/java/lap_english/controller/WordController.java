@@ -29,7 +29,7 @@ public class WordController {
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteWord(@PathVariable Long id) {
         wordService.delete(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "success", null);
+        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
 
     @PutMapping("/{id}")

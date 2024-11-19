@@ -30,8 +30,7 @@ public class AzureBlobServiceImpl implements IAzureService {
     @Override
     public String upload(MultipartFile file) {
         try {
-            long var10000 = System.currentTimeMillis();
-            String blobFileName = var10000 + "_" + file.getOriginalFilename();
+            String blobFileName = System.currentTimeMillis() + "_" + System.currentTimeMillis() ;
             BlobClient blobClient = this.blobServiceClient.getBlobContainerClient(this.containerName).getBlobClient(blobFileName);
             blobClient.upload(file.getInputStream(), file.getSize(), true);
             return blobFileName;

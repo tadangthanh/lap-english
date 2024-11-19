@@ -27,7 +27,6 @@ public class User extends BaseEntity implements UserDetails {
     private Skill skill;
 
 
-
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

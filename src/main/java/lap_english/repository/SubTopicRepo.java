@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SubTopicRepo extends JpaRepository<SubTopic, Long>, JpaSpecificationExecutor<SubTopic> {
     @Query("SELECT s FROM SubTopic s WHERE s.mainTopic.id = ?1")
@@ -16,4 +18,6 @@ public interface SubTopicRepo extends JpaRepository<SubTopic, Long>, JpaSpecific
     boolean existsByName(String name);
     @Query("SELECT s FROM SubTopic s WHERE lower(s.name) LIKE lower(concat('%', ?1, '%'))")
     Page<SubTopic> findByNameContaining(String name, Pageable pageable);
+    @Query("SELECT s FROM SubTopic s WHERE s.mainTopic.id = ?1")
+    List<SubTopic> findAllByMainTopicId(Long mainTopicId);
 }

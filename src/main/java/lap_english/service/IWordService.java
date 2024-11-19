@@ -14,5 +14,6 @@ public interface IWordService {
     PageResponse<?> getBySubTopicId(Long subTopicId, Integer page, Integer size);
 
     PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] word);
+    void deleteBySubTopicId(Long subTopicId);
 
 }

@@ -9,6 +9,7 @@ import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.MainTopicMapper;
 import lap_english.repository.MainTopicRepo;
 import lap_english.service.IMainTopicService;
+import lap_english.service.ISubTopicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import java.util.List;
 public class MainTopicServiceImpl implements IMainTopicService {
     private final MainTopicMapper mainTopicMapper;
     private final MainTopicRepo mainTopicRepo;
+    private final ISubTopicService subTopicService;
 
     @Override
     public MainTopicDto create(MainTopicDto mainTopicDto) {
@@ -39,8 +41,14 @@ public class MainTopicServiceImpl implements IMainTopicService {
             throw new DuplicateResource("Main Topic is exist");
         }
     }
+
     @Override
     public void delete(Long id) {
+        MainTopic mainTopic = mainTopicRepo.findById(id).orElseThrow(() -> {
+            log.error("Main Topic not found");
+            return new ResourceNotFoundException("Main Topic not found");
+        });
+        subTopicService.deleteByMainTopicId(id);
         mainTopicRepo.deleteById(id);
     }
 

@@ -12,12 +12,17 @@ public interface ISubTopicService {
 
     void delete(Long id);
 
-    SubTopicDto update(SubTopicDto subTopicDto,MultipartFile file);
+    SubTopicDto update(SubTopicDto subTopicDto, MultipartFile file);
 
     PageResponse<?> getPage(int page, int size, String sort);
 
     PageResponse<?> getByMainTopicId(Long mainTopicId, int page, int size);
-    PageResponse<?> findByName(String name, int page, int size,String sort);
+
+    PageResponse<?> findByName(String name, int page, int size, String sort);
 
     PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] subTopic);
+
+    void deleteByMainTopicId(Long mainTopicId);
+
+    SubTopicDto getById(Long id);
 }
