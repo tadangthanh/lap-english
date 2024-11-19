@@ -57,7 +57,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     private void validateSubTopic(SubTopicDto subTopicDto) {
-        if (this.subTopicRepo.existsByName(subTopicDto.getName())) {
+        if (this.subTopicRepo.existsByNameAndMainTopicId(subTopicDto.getName(),subTopicDto.getMainTopicId() )) {
             throw new DuplicateResource("Sub Topic already exists");
         }
     }

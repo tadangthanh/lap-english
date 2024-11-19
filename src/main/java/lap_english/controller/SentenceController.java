@@ -7,6 +7,7 @@ import lap_english.service.ISentenceService;
 import lap_english.validation.Create;
 import lap_english.validation.Update;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +37,9 @@ public class SentenceController {
     }
 
     @GetMapping
-    public ResponseData<?> getAll(@Min(0)@RequestParam(defaultValue = "0") int page,@Min(1) @RequestParam(defaultValue = "10") int size) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.getAll(page, size));
+    public ResponseData<?> getAll(Pageable pageable,
+                                  @RequestParam(required = false, value = "sentence") String[] sentence) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.advancedSearch(pageable, sentence));
     }
 
     @GetMapping("/sub-topic/{subTopicId}")

@@ -2,6 +2,7 @@ package lap_english.service;
 
 import lap_english.dto.MainTopicDto;
 import lap_english.dto.response.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface IMainTopicService {
 
     PageResponse<?> getPage(int page, int size);
     List<MainTopicDto> getAll();
+
+    PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] mainTopic);
 }

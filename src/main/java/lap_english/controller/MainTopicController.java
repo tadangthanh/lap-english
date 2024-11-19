@@ -5,6 +5,7 @@ import lap_english.dto.MainTopicDto;
 import lap_english.dto.response.ResponseData;
 import lap_english.service.IMainTopicService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,9 @@ public class MainTopicController {
     }
 
     @GetMapping
-    public ResponseData<?> getPage(@Min(0) @RequestParam(defaultValue = "0") int page, @Min(1) @RequestParam(defaultValue = "10") int size) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getPage(page, size));
+    public ResponseData<?> getPage(   Pageable pageable,
+                                      @RequestParam(required = false, value = "maintopic") String[] mainTopic) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.advanceSearchBySpecification(pageable, mainTopic));
     }
     @GetMapping("/list")
     public ResponseData<?> getAll() {

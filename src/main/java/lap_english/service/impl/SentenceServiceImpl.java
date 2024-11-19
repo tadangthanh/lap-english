@@ -2,22 +2,30 @@ package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
 import lap_english.dto.SentenceDto;
-import lap_english.dto.SubTopicDto;
+import lap_english.dto.WordDto;
 import lap_english.dto.response.PageResponse;
 import lap_english.entity.Sentence;
 import lap_english.entity.SubTopic;
+import lap_english.entity.Word;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.SentenceMapper;
 import lap_english.repository.SentenceRepo;
 import lap_english.repository.SubTopicRepo;
+import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.ISentenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional
@@ -83,5 +91,31 @@ public class SentenceServiceImpl implements ISentenceService {
         Page<Sentence> sentencePage = sentenceRepo.findBySubTopicId(subTopicId, pageRequest);
         List<SentenceDto> sentenceDtoList = sentenceMapper.toListDto(sentencePage.getContent());
         return PageResponse.builder().items(sentenceDtoList).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(page).pageSize(size).build();
+    }
+
+    @Override
+    public PageResponse<?> advancedSearch(Pageable pageable, String[] sentence) {
+        if (sentence != null && sentence.length > 0) {
+            EntitySpecificationsBuilder<Sentence> builder = new EntitySpecificationsBuilder<>();
+            Pattern pattern = Pattern.compile("([a-zA-Z0-9_.]+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)");
+            for (String s : sentence) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                }
+            }
+            Specification<Sentence> spec = builder.build();
+            // nó trả trả về 1 spec mới
+            Page<Sentence> sentencePage = sentenceRepo.findAll(spec, pageable);
+
+            return convertToPageResponse(sentencePage, pageable);
+        }
+        return convertToPageResponse(sentenceRepo.findAll(pageable), pageable);
+    }
+
+
+    private PageResponse<?> convertToPageResponse(Page<Sentence> sentencePage, Pageable pageable) {
+        List<SentenceDto> response = sentencePage.stream().map(this.sentenceMapper::toDto).collect(toList());
+        return PageResponse.builder().items(response).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }
