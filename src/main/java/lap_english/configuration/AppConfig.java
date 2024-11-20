@@ -8,12 +8,17 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.concurrent.DelegatingSecurityContextExecutor;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableCaching
+@EnableAsync
 public class AppConfig {
     @Bean
     public TextToSpeechClient textToSpeechClient() throws IOException {
@@ -29,6 +34,16 @@ public class AppConfig {
 
         // Khởi tạo TextToSpeechClient
         return TextToSpeechClient.create(settings);
+    }
+    @Bean(name = "taskExecutor") // Đặt tên taskExecutor
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5); // Số thread chính
+        executor.setMaxPoolSize(10); // Số thread tối đa
+        executor.setQueueCapacity(500); // Dung lượng hàng đợi
+        executor.setThreadNamePrefix("AsyncThread-");
+        executor.initialize();
+        return new DelegatingSecurityContextExecutor(executor);
     }
 
 }

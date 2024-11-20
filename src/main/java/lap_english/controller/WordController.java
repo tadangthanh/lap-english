@@ -43,5 +43,9 @@ public class WordController {
                                           @RequestParam(required = false, value = "word") String[] word) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.advanceSearchBySpecification(pageable,word));
     }
+    @PostMapping("/import/{subTopicId}")
+    public ResponseData<?> importWordExcel(@PathVariable @Min(1) Long subTopicId, @RequestPart("file") MultipartFile file) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
+    }
 
 }

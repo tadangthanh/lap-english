@@ -35,6 +35,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final JwtAuthenticationFilter preFilter;
     private final String[] WHITE_LIST = {
             "/auth/**",
+            "/ws/**",
             "/api/blob/**",
     };
     @Override

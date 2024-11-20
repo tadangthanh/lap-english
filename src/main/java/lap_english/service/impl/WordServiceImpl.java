@@ -4,14 +4,17 @@ import com.google.cloud.texttospeech.v1.SsmlVoiceGender;
 import jakarta.transaction.Transactional;
 import lap_english.dto.WordDto;
 import lap_english.dto.response.PageResponse;
+import lap_english.dto.response.ResponseData;
 import lap_english.entity.SubTopic;
 import lap_english.entity.Word;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.WordMapper;
 import lap_english.repository.SubTopicRepo;
+import lap_english.repository.UserRepo;
 import lap_english.repository.WordRepo;
 import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IAzureService;
+import lap_english.service.IImportWordExcelService;
 import lap_english.service.IWordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -29,6 +36,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +52,9 @@ public class WordServiceImpl implements IWordService {
     private final SubTopicRepo subTopicRepo;
     private final IAzureService azureService;
     private final TextToSpeechService textToSpeechService;
+    private final IImportWordExcelService importWordExcelService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final UserRepo userRepo;
 
     @Override
     public void delete(Long id) {
@@ -217,6 +228,29 @@ public class WordServiceImpl implements IWordService {
             }
         });
     }
+
+    @Async("taskExecutor")
+    @Override
+    public CompletableFuture<Integer> importFromExcel(Long subTopicId, MultipartFile file) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            List<WordDto> wordList = importWordExcelService.importWordExcel(file);
+            for (WordDto wordDto : wordList) {
+                wordDto.setSubTopicId(subTopicId);
+                create(wordDto);
+            }
+            // Gửi thông báo khi hoàn thành
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-status",
+                    new ResponseData<>(HttpStatus.CREATED.value(), "import successful", wordList.size()));
+            return CompletableFuture.completedFuture(wordList.size());
+        } catch (Exception e) {
+            log.error("Fail to import word: {}", e.getMessage());
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-status",
+                    new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null));
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
 
     private PageResponse<?> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
         List<WordDto> response = wordPage.stream().map(this.wordMapper::toDto).collect(toList());

@@ -44,4 +44,6 @@ public class WordDto extends BaseDto {
     private String imageBlobName;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MultipartFile file;
+
+
 }
