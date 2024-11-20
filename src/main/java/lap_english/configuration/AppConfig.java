@@ -1,5 +1,9 @@
 package lap_english.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.texttospeech.v1.TextToSpeechClient;
 import com.google.cloud.texttospeech.v1.TextToSpeechSettings;
@@ -35,6 +39,7 @@ public class AppConfig {
         // Khởi tạo TextToSpeechClient
         return TextToSpeechClient.create(settings);
     }
+
     @Bean(name = "taskExecutor") // Đặt tên taskExecutor
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -46,4 +51,10 @@ public class AppConfig {
         return new DelegatingSecurityContextExecutor(executor);
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return JsonMapper
+                .builder()
+                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build();
+    }
 }

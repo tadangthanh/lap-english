@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,5 +48,9 @@ public class SentenceController {
                                            @Min(0) @RequestParam(defaultValue = "0") int page,
                                            @Min(1) @RequestParam(defaultValue = "10") int size) {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.getBySubTopicId(subTopicId, page, size));
+    }
+    @PostMapping("/import/{subTopicId}")
+    public ResponseData<?> importFromExcel(@PathVariable Long subTopicId, @RequestParam("file") MultipartFile file) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.importFromExcel(subTopicId, file));
     }
 }

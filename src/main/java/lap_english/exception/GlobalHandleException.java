@@ -26,7 +26,7 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UploadFailureException.class,InvalidDataException.class})
+    @ExceptionHandler({UploadFailureException.class,InvalidDataException.class,InvalidFileException.class})
     public final ResponseEntity<ErrorResponse> handleUploadFail(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());

@@ -10,11 +10,10 @@ import lap_english.entity.Word;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.WordMapper;
 import lap_english.repository.SubTopicRepo;
-import lap_english.repository.UserRepo;
 import lap_english.repository.WordRepo;
 import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IAzureService;
-import lap_english.service.IImportWordExcelService;
+import lap_english.service.IReaderWordExcelService;
 import lap_english.service.IWordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +51,8 @@ public class WordServiceImpl implements IWordService {
     private final SubTopicRepo subTopicRepo;
     private final IAzureService azureService;
     private final TextToSpeechService textToSpeechService;
-    private final IImportWordExcelService importWordExcelService;
+    private final IReaderWordExcelService importWordExcelService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final UserRepo userRepo;
 
     @Override
     public void delete(Long id) {
@@ -240,12 +238,12 @@ public class WordServiceImpl implements IWordService {
                 create(wordDto);
             }
             // Gửi thông báo khi hoàn thành
-            messagingTemplate.convertAndSendToUser(username, "/topic/import-status",
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-word-status",
                     new ResponseData<>(HttpStatus.CREATED.value(), "import successful", wordList.size()));
             return CompletableFuture.completedFuture(wordList.size());
         } catch (Exception e) {
             log.error("Fail to import word: {}", e.getMessage());
-            messagingTemplate.convertAndSendToUser(username, "/topic/import-status",
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-word-status",
                     new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null));
             return CompletableFuture.failedFuture(e);
         }

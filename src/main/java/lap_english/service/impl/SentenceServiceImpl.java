@@ -2,16 +2,16 @@ package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
 import lap_english.dto.SentenceDto;
-import lap_english.dto.WordDto;
 import lap_english.dto.response.PageResponse;
+import lap_english.dto.response.ResponseData;
 import lap_english.entity.Sentence;
 import lap_english.entity.SubTopic;
-import lap_english.entity.Word;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.SentenceMapper;
 import lap_english.repository.SentenceRepo;
 import lap_english.repository.SubTopicRepo;
 import lap_english.repository.specification.EntitySpecificationsBuilder;
+import lap_english.service.IReaderSentenceExcelService;
 import lap_english.service.ISentenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +41,8 @@ public class SentenceServiceImpl implements ISentenceService {
     private final SentenceMapper sentenceMapper;
     private final SentenceRepo sentenceRepo;
     private final SubTopicRepo subTopicRepo;
+    private final IReaderSentenceExcelService readerSentenceExcelService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public void delete(Long id) {
@@ -111,6 +119,28 @@ public class SentenceServiceImpl implements ISentenceService {
             return convertToPageResponse(sentencePage, pageable);
         }
         return convertToPageResponse(sentenceRepo.findAll(pageable), pageable);
+    }
+
+    @Async("taskExecutor")
+    @Override
+    public CompletableFuture<Integer> importFromExcel(Long subTopicId, MultipartFile file) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+            List<SentenceDto> sentenceDtoList = readerSentenceExcelService.importSentenceFromExcel(file);
+            for (SentenceDto sentenceDto : sentenceDtoList) {
+                sentenceDto.setSubTopicId(subTopicId);
+                save(sentenceDto);
+            }
+            // Gửi thông báo khi hoàn thành
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-sentence-status",
+                    new ResponseData<>(HttpStatus.CREATED.value(), "import successful", sentenceDtoList.size()));
+            return CompletableFuture.completedFuture(sentenceDtoList.size());
+        } catch (Exception e) {
+            log.error("Fail to import word: {}", e.getMessage());
+            messagingTemplate.convertAndSendToUser(username, "/topic/import-sentence-status",
+                    new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null));
+            return CompletableFuture.failedFuture(e);
+        }
     }
 
 
