@@ -22,19 +22,31 @@ public class SubTopicController {
 
     @PostMapping
     public ResponseData<?> createSubTopic(@RequestPart("data") @Validated(Create.class) SubTopicDto subTopicDto, @RequestPart(value = "file", required = false) MultipartFile file) {
-        return new ResponseData<>(HttpStatus.CREATED.value(), "success", subTopicService.create(subTopicDto, file));
+        try {
+            return new ResponseData<>(HttpStatus.CREATED.value(), "success", subTopicService.create(subTopicDto, file));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteSubTopic(@PathVariable Long id) {
-        subTopicService.delete(id);
-        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
+        try {
+            subTopicService.delete(id);
+            return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "Delete sub topic successfully", null);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseData<?> updateSubTopic(@PathVariable Long id, @RequestPart("data") @Validated(Update.class) SubTopicDto subTopicDto, @RequestPart(value = "file", required = false) MultipartFile file) {
-        subTopicDto.setId(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "success", subTopicService.update(subTopicDto, file));
+        try {
+            subTopicDto.setId(id);
+            return new ResponseData<>(HttpStatus.OK.value(), "success", subTopicService.update(subTopicDto, file));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
     @GetMapping
@@ -43,19 +55,31 @@ public class SubTopicController {
             @RequestParam(required = false, value = "subtopic") String[] subTopic
     ) {
         //?page=0&size=10&sort=id,desc&subtopic=name~d
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", subTopicService.advanceSearchBySpecification(pageable, subTopic));
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", subTopicService.advanceSearchBySpecification(pageable, subTopic));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
     @GetMapping("/main-topic/{mainTopicId}")
     public ResponseData<?> getByMainTopic(@PathVariable("mainTopicId") Long mainTopicId,
                                           @Min(0) @RequestParam(defaultValue = "0") int page,
                                           @Min(1) @RequestParam(defaultValue = "10") int size) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", subTopicService.getByMainTopicId(mainTopicId, page, size));
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", subTopicService.getByMainTopicId(mainTopicId, page, size));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseData<?> getById(@PathVariable Long id) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully", subTopicService.getById(id));
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully", subTopicService.getById(id));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
 }

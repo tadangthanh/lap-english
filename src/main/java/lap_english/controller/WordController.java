@@ -22,30 +22,50 @@ public class WordController {
 
     @PostMapping
     public ResponseData<?> create(@Validated(Create.class) @RequestPart("data") WordDto wordDto, @RequestPart(value = "file", required = false) MultipartFile file) {
-        wordDto.setFile(file);
-        return new ResponseData<>(HttpStatus.CREATED.value(), "success", wordService.create(wordDto));
+      try{
+          wordDto.setFile(file);
+          return new ResponseData<>(HttpStatus.CREATED.value(), "success", wordService.create(wordDto));
+      }catch (Exception e){
+          return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+      }
     }
 
     @DeleteMapping("/{id}")
     public ResponseData<?> deleteWord(@PathVariable Long id) {
-        wordService.delete(id);
-        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
+      try{
+          wordService.delete(id);
+          return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
+      }catch (Exception e){
+          return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+      }
     }
 
     @PutMapping("/{id}")
     public ResponseData<?> update(@PathVariable Long id, @Validated(Update.class) @RequestBody WordDto wordDto) {
-        wordDto.setId(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "success", wordService.update(wordDto));
+       try{
+           wordDto.setId(id);
+           return new ResponseData<>(HttpStatus.OK.value(), "success", wordService.update(wordDto));
+       }catch (Exception e){
+           return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+       }
     }
 
     @GetMapping
     public ResponseData<?> getBySubTopic(Pageable pageable,
                                           @RequestParam(required = false, value = "word") String[] word) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.advanceSearchBySpecification(pageable,word));
+      try{
+          return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.advanceSearchBySpecification(pageable,word));
+      }catch (Exception e){
+          return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+      }
     }
     @PostMapping("/import/{subTopicId}")
     public ResponseData<?> importWordExcel(@PathVariable @Min(1) Long subTopicId, @RequestPart("file") MultipartFile file) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
+        try{
+            return new ResponseData<>(HttpStatus.OK.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
+        }catch (Exception e){
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 
 }

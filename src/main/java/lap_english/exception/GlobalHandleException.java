@@ -7,15 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalHandleException extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler({ResourceNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public final ResponseEntity<ErrorResponse> handleResourceNotFound(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());
@@ -26,7 +29,8 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UploadFailureException.class,InvalidDataException.class,InvalidFileException.class})
+    @ExceptionHandler({UploadFailureException.class, InvalidDataException.class, InvalidFileException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public final ResponseEntity<ErrorResponse> handleUploadFail(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());
@@ -36,7 +40,9 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         errorResponse.setPath(request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(DuplicateResource.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public final ResponseEntity<ErrorResponse> handleDuplicateResource(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());
