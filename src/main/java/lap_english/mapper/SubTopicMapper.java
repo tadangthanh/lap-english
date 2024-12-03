@@ -24,4 +24,6 @@ public interface SubTopicMapper {
     void updateEntityFromDto(SubTopicDto dto, @MappingTarget SubTopic entity);
 
     List<SubTopicDto> toListDto(List<SubTopic> content);
+
+
 }

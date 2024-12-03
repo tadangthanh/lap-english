@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class ExcelReaderUtil<T> { // T là kiểu dữ liệu của object cần convert
-    private final ObjectMapper objectMapper;
+//    private final ObjectMapper objectMapper;
 
     public void validateFile(MultipartFile file) {
         if (file == null) {
@@ -74,6 +74,7 @@ public class ExcelReaderUtil<T> { // T là kiểu dữ liệu của object cần
      * @return : trả về object sau khi convert
      */
     public T convertToEntity( Map<String, Integer> header, Row row, Class<T> clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> data = new HashMap<>();
         // key chứa tên cột, và value chứa index của cột đó
         for (Map.Entry<String, Integer> entry : header.entrySet()) {

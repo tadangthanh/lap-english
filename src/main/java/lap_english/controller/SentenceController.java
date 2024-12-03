@@ -72,10 +72,10 @@ public class SentenceController {
 
     @PostMapping("/import/{subTopicId}")
     public ResponseData<?> importFromExcel(@PathVariable Long subTopicId, @RequestParam("file") MultipartFile file) {
-       try {
-           return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.importFromExcel(subTopicId, file));
-       } catch (Exception e) {
-           return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
-       }
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Success", sentenceService.importFromExcel(subTopicId, file));
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+        }
     }
 }

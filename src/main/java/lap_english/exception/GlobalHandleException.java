@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalHandleException extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -58,7 +58,7 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ErrorObjectDetails errorObjectDetails = new ErrorObjectDetails();
         errorObjectDetails.setTimestamp(LocalDateTime.now());
-        errorObjectDetails.setMessage(ex.getMessage().substring(ex.getMessage().lastIndexOf("[") + 1, ex.getMessage().lastIndexOf("]") - 1));
+        errorObjectDetails.setMessage(ex.getMessage().substring(ex.getMessage().lastIndexOf("[")+1,ex.getMessage().lastIndexOf("]")-1));
         errorObjectDetails.setField(Objects.requireNonNull(ex.getBindingResult().getFieldError()).getField());
         errorObjectDetails.setDetails(ex.getBindingResult().getFieldError().getDefaultMessage());
         return new ResponseEntity<>(errorObjectDetails, HttpStatus.BAD_REQUEST);

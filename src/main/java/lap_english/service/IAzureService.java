@@ -11,6 +11,8 @@ public interface IAzureService {
     String getBlobUrl(String blobName);
 
     boolean deleteBlob(String blobName);
+
     String upload(InputStream data, long length, String fileName, String contentType);
+
     InputStream downloadBlob(String blobName); // Tải blob về
 }

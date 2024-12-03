@@ -51,10 +51,10 @@ public class AppConfig {
         return new DelegatingSecurityContextExecutor(executor);
     }
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        return JsonMapper
-                .builder()
-                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build();
-    }
+//    @Bean
+//    public ObjectMapper objectMapper() {
+//        return JsonMapper
+//                .builder()
+//                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).build();
+//    }
 }

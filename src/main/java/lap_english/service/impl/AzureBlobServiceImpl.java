@@ -30,7 +30,7 @@ public class AzureBlobServiceImpl implements IAzureService {
     @Override
     public String upload(MultipartFile file) {
         try {
-            String blobFileName = System.currentTimeMillis() + "_" + System.currentTimeMillis() ;
+            String blobFileName = System.currentTimeMillis() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             BlobClient blobClient = this.blobServiceClient.getBlobContainerClient(this.containerName).getBlobClient(blobFileName);
             blobClient.upload(file.getInputStream(), file.getSize(), true);
             return blobFileName;
@@ -106,4 +106,5 @@ public class AzureBlobServiceImpl implements IAzureService {
             throw new ResourceNotFoundException("Lỗi khi tải blob: " + blobName);
         }
     }
+
 }
