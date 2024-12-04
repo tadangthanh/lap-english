@@ -1,6 +1,7 @@
 package lap_english.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lap_english.dto.GrammaticalStructureDto;
 
 public class ResponseData<T> {
     private final int status;

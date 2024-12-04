@@ -1,9 +1,6 @@
 package lap_english.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +14,7 @@ import lombok.Setter;
 @Table(name = "grammatical_structure")
 public class GrammaticalStructure extends BaseEntity {
     private String description;
+    @Column(name = "structure", nullable = false)
     private String structure;
     @ManyToOne
     @JoinColumn(name = "grammar_id")

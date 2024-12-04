@@ -1,12 +1,10 @@
 package lap_english.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 @Getter
@@ -15,7 +13,9 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 @Entity
 @Table(name = "grammar")
+@Setter
 public class Grammar extends BaseEntity {
+    @Column(name = "name", nullable = false)
     private String name;
     private String description;
     @ManyToOne

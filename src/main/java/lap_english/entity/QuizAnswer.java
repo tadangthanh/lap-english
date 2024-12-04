@@ -9,14 +9,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "exercise_grammar")
-public class ExerciseGrammar extends BaseEntity {
+@Table(name = "quiz_answer")
+public class QuizAnswer extends BaseEntity {
+    private String answer;
+    private boolean isCorrect;
+    private String imgAnswer;
     @ManyToOne
-    @JoinColumn(name = "grammar_id")
-    private GrammaticalStructure grammaticalStructure;
+    @JoinColumn(name = "quiz_id")
+    private CustomQuiz customQuiz;
 }
