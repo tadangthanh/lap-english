@@ -57,7 +57,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     private void validateSubTopic(SubTopicDto subTopicDto) {
-        if (this.subTopicRepo.existsByNameAndMainTopicId(subTopicDto.getName(),subTopicDto.getMainTopicId() )) {
+        if (this.subTopicRepo.existsByNameAndMainTopicId(subTopicDto.getName(), subTopicDto.getMainTopicId())) {
             throw new DuplicateResource("Sub Topic already exists");
         }
     }
@@ -111,9 +111,9 @@ public class SubTopicServiceImpl implements ISubTopicService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-               if(file!=null){
-                   deleteFile(blobName);
-               }
+                if (file != null) {
+                    deleteFile(blobName);
+                }
             }
 
             @Override

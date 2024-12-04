@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,4 +21,6 @@ public class GrammaticalStructure extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "grammar_id")
     private Grammar grammar;
+    @OneToMany(mappedBy = "grammaticalStructure")
+    private List<ExerciseGrammar> exerciseGrammars;
 }

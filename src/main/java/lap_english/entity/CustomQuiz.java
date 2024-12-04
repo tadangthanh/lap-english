@@ -13,12 +13,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "custom_quiz")
+@Table(name = "custom_quiz") // câu hỏi quiz
 public class CustomQuiz extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private TypeQuiz typeQuiz;
     private String question;
     private String imageQuestion;
-    @OneToMany(mappedBy = "customQuiz", cascade = CascadeType.ALL)
+    // danh sách các câu trả lời của bài quiz này
+    @OneToMany(mappedBy = "customQuiz")
     private List<QuizAnswer> quizAnswers;
+    @OneToOne(mappedBy = "customQuiz")
+    private ExerciseGrammar exerciseGrammar;
 }

@@ -14,12 +14,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "quiz_answer")
+@Table(name = "quiz_answer") // câu trả lời của bài quiz
 public class QuizAnswer extends BaseEntity {
     private String answer;
     private boolean isCorrect;
     private String imgAnswer;
     @ManyToOne
-    @JoinColumn(name = "quiz_id")
+    @JoinColumn(name = "custom_quiz_id")
     private CustomQuiz customQuiz;
 }
