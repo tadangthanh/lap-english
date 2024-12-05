@@ -15,6 +15,7 @@ public interface GrammarMapper {
 
     @Mapping(target = "name", source = "name")
     @Mapping(target = "description", source = "description")
+    @Mapping(target = "id", ignore = true)
     Grammar toEntity(GrammarDto dto);
 
     @Mapping(target = "id", ignore = true)
