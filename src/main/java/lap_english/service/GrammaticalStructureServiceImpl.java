@@ -32,10 +32,12 @@ public class GrammaticalStructureServiceImpl implements IGrammaticalStructureSer
     private final GrammaticalStructureRepo grammaticalStructureRepo;
     private final GrammaticalStructureMapper grammaticalStructureMapper;
     private final GrammarRepo grammarRepo;
+    private final IExerciseGrammarService exerciseGrammarService;
 
     @Override
     public void delete(Long id) {
-
+        exerciseGrammarService.deleteByGrammaticalStructureId(id);
+        grammaticalStructureRepo.deleteById(id);
     }
 
     @Override
@@ -79,6 +81,13 @@ public class GrammaticalStructureServiceImpl implements IGrammaticalStructureSer
             return convertToPageResponse(grammaticalStructurePage, pageable);
         }
         return convertToPageResponse(grammaticalStructureRepo.findAll(pageable), pageable);
+    }
+
+    @Override
+    public void deleteByGrammarId(Long grammarId) {
+        List<GrammaticalStructure> grammaticalStructures = grammaticalStructureRepo.findByGrammarId(grammarId);
+        grammaticalStructures.forEach(grammaticalStructure -> exerciseGrammarService.deleteByGrammaticalStructureId(grammaticalStructure.getId()));
+        grammaticalStructureRepo.deleteAll(grammaticalStructures);
     }
 
     private PageResponse<?> convertToPageResponse(Page<GrammaticalStructure> grammaticalStructurePage, Pageable pageable) {

@@ -12,6 +12,7 @@ public interface IGrammarService {
     GrammarDto update(GrammarDto grammarDto);
 
     GrammarDto findById(Long id);
+    void deleteByTypeGrammarId(Long typeGrammarId);
 
     PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] grammar);
 }

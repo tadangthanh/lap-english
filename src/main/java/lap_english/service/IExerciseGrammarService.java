@@ -12,4 +12,6 @@ public interface IExerciseGrammarService {
 
     PageResponse<?> getByGrammaticalStructureId(Long grammaticalStructureId, Integer page, Integer size);
 
+    void deleteByGrammaticalStructureId(Long grammaticalStructureId);
+
 }

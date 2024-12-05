@@ -14,4 +14,5 @@ public interface IGrammaticalStructureService {
     GrammaticalStructureDto findById(Long id);
 
     PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] grammaticalStructure);
+    void deleteByGrammarId(Long grammarId);
 }

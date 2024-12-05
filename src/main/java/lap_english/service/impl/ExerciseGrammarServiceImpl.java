@@ -1,12 +1,12 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
-import lap_english.dto.response.CustomQuizResponse;
-import lap_english.dto.response.QuizAnswerResponse;
 import lap_english.dto.request.CustomQuizRequest;
 import lap_english.dto.request.ExerciseGrammarRequest;
+import lap_english.dto.response.CustomQuizResponse;
 import lap_english.dto.response.ExerciseGrammarResponse;
 import lap_english.dto.response.PageResponse;
+import lap_english.dto.response.QuizAnswerResponse;
 import lap_english.entity.CustomQuiz;
 import lap_english.entity.ExerciseGrammar;
 import lap_english.entity.GrammaticalStructure;
@@ -100,6 +100,14 @@ public class ExerciseGrammarServiceImpl implements IExerciseGrammarService {
             e.setCustomQuiz(customQuizResponse);
         });
         return PageResponse.builder().items(exerciseGrammarResponses).totalItems(exerciseGrammarPage.getTotalElements()).totalPage(exerciseGrammarPage.getTotalPages()).hasNext(exerciseGrammarPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+    }
+
+    @Override
+    public void deleteByGrammaticalStructureId(Long grammaticalStructureId) {
+        List<ExerciseGrammar> exerciseGrammarList = exerciseGrammarRepo.findByGrammaticalStructureId(grammaticalStructureId);
+        exerciseGrammarList.forEach(e -> {
+            delete(e.getId());
+        });
     }
 
 
