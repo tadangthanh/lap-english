@@ -1,7 +1,6 @@
 package lap_english.dto.response;
 
 import lap_english.dto.BaseDto;
-import lap_english.dto.CustomQuizResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

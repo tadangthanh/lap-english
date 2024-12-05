@@ -179,7 +179,13 @@ public class WordServiceImpl implements IWordService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Word> wordPage = wordRepo.findBySubTopicId(subTopicId, pageRequest);
         List<WordDto> wordDtoList = wordMapper.toListDto(wordPage.getContent());
-        return PageResponse.builder().items(wordDtoList).totalItems(wordPage.getTotalElements()).totalPage(wordPage.getTotalPages()).hasNext(wordPage.hasNext()).pageNo(page).pageSize(size).build();
+        return PageResponse.builder()
+                .items(wordDtoList)
+                .totalItems(wordPage.getTotalElements())
+                .totalPage(wordPage.getTotalPages())
+                .hasNext(wordPage.hasNext())
+                .pageNo(page)
+                .pageSize(size).build();
     }
 
     @Override

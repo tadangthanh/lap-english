@@ -14,4 +14,5 @@ public interface ExerciseGrammarMapper {
     ExerciseGrammarResponse entityToResponse(ExerciseGrammar exerciseGrammar);
 
     ExerciseGrammar responseToEntity(ExerciseGrammarResponse exerciseGrammarResponse);
+
 }

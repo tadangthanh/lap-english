@@ -1,10 +1,11 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
-import lap_english.dto.CustomQuizResponse;
+import lap_english.dto.response.CustomQuizResponse;
 import lap_english.dto.request.CustomQuizRequest;
 import lap_english.entity.CustomQuiz;
 import lap_english.entity.ExerciseGrammar;
+import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.CustomQuizMapper;
 import lap_english.repository.CustomQuizRepo;
 import lap_english.repository.ExerciseGrammarRepo;
@@ -30,17 +31,21 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
 
 
     @Override
-    public CustomQuizResponse save(CustomQuizRequest customQuizRequest, Long exerciseGrammarId) {
+    public CustomQuizResponse save(CustomQuizRequest customQuizRequest) {
         CustomQuiz customQuiz = customQuizMapper.requestToEntity(customQuizRequest);
-        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(exerciseGrammarId);
+        // tìm bài tập mà custom quiz thuộc về
+        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(customQuizRequest.getExerciseGrammarId());
         customQuiz.setExerciseGrammar(exerciseGrammar);
         exerciseGrammar.setCustomQuiz(customQuiz);
+        // lưu custom quiz
         customQuiz = customQuizRepo.saveAndFlush(customQuiz);
         // lưu các đáp án
         saveQuizAnswers(customQuizRequest, customQuiz.getId());
+        // nếu câu hỏi ko có ảnh thì trả về ngay
         if (customQuizRequest.getImageQuestion() == null) {
             return customQuizMapper.entityToResponse(customQuiz);
         }
+        // nếu câu hỏi có ảnh thì upload ảnh
         // Biến tạm giữ tên blob để rollback nếu cần
         String uploadedImageBlobName;
         // upload ảnh của quiz lên
@@ -66,7 +71,8 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
 
     private void saveQuizAnswers(CustomQuizRequest customQuizRequest, Long customQuizId) {
         customQuizRequest.getQuizAnswers().forEach(quizAnswerRequest -> {
-            quizAnswerService.save(quizAnswerRequest, customQuizId);
+            quizAnswerRequest.setCustomQuizId(customQuizId);
+            quizAnswerService.save(quizAnswerRequest);
         });
     }
 
@@ -80,17 +86,41 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
     @Override
     public void delete(Long id) {
         CustomQuiz customQuiz = findCustomQuizById(id);
+        String imageQuestion = customQuiz.getImageQuestion();
+        quizAnswerService.deleteByCustomQuizId(id);
         customQuizRepo.delete(customQuiz);
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCompletion(int status) {
-                if (status == TransactionSynchronization.STATUS_COMMITTED) {
-                    // Xóa ảnh đã upload nếu transaction thành công
-                    azureService.deleteBlob(customQuiz.getImageQuestion());
-                    log.info("Transaction committed successfully, image file deleted: {}", customQuiz.getImageQuestion());
+        if (imageQuestion != null && !imageQuestion.isEmpty()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if (status == TransactionSynchronization.STATUS_COMMITTED) {
+                        // Xóa ảnh đã upload nếu transaction thành công
+                        azureService.deleteBlob(imageQuestion);
+                        log.info("Transaction committed successfully, image file deleted: {}", imageQuestion);
+                    }
                 }
-            }
+            });
+        }
+    }
+
+    @Override
+    public CustomQuizResponse getByExerciseGrammarId(Long exerciseGrammarId) {
+        CustomQuiz customQuizPage = findCustomQuizByExerciseGrammarId(exerciseGrammarId);
+        return customQuizMapper.entityToResponse(customQuizPage);
+    }
+
+    private CustomQuiz findCustomQuizByExerciseGrammarId(Long id) {
+        return customQuizRepo.findByExerciseGrammarId(id).orElseThrow(() -> {
+            log.warn("Custom Quiz not found with exercise grammar id: {}", id);
+            return new ResourceNotFoundException("Custom Quiz not found with exercise grammar id: " + id);
         });
+    }
+
+    @Override
+    public void deleteByExerciseGrammarId(Long exerciseGrammarId) {
+        CustomQuiz customQuiz = findCustomQuizByExerciseGrammarId(exerciseGrammarId);
+        quizAnswerService.deleteByCustomQuizId(customQuiz.getId());
+        delete(customQuiz.getId());
     }
 
     private CustomQuiz findCustomQuizById(Long id) {

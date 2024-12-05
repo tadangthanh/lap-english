@@ -12,7 +12,6 @@ import lap_english.repository.GrammarRepo;
 import lap_english.repository.TypeGrammarRepo;
 import lap_english.repository.specification.EntitySpecificationsBuilder;
 import lap_english.service.IGrammarService;
-import lap_english.service.IGrammaticalStructureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,7 +34,6 @@ public class GrammarServiceImpl implements IGrammarService {
     private final GrammarRepo grammarRepo;
     private final GrammarMapper grammarMapper;
     private final TypeGrammarRepo typeGrammarRepo;
-    private final IGrammaticalStructureService grammaticalStructureService;
 
     @Override
     public void delete(Long id) {

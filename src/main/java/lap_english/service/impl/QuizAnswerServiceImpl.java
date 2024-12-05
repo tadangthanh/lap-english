@@ -1,7 +1,7 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
-import lap_english.dto.QuizAnswerResponse;
+import lap_english.dto.response.QuizAnswerResponse;
 import lap_english.dto.request.QuizAnswerRequest;
 import lap_english.entity.CustomQuiz;
 import lap_english.entity.QuizAnswer;
@@ -46,18 +46,20 @@ public class QuizAnswerServiceImpl implements IQuizAnswerService {
     }
 
     @Override
-    public QuizAnswerResponse save(QuizAnswerRequest quizAnswerRequest,Long customQuizId) {
+    public QuizAnswerResponse save(QuizAnswerRequest quizAnswerRequest) {
         QuizAnswer quizAnswer = quizAnswerMapper.requestToEntity(quizAnswerRequest);
-        CustomQuiz customQuiz = findCustomQuizById(customQuizId);
+        // tìm câu hỏi của quiz
+        CustomQuiz customQuiz = findCustomQuizById(quizAnswerRequest.getCustomQuizId());
         quizAnswer.setCustomQuiz(customQuiz);
 
         // Lưu câu trả lời tạm thời vào database
         quizAnswer = quizAnswerRepo.saveAndFlush(quizAnswer);
+        // nếu k có ảnh thì return luôn
         if (quizAnswerRequest.getImgAnswer() == null) {
             return quizAnswerMapper.entityToResponse(quizAnswer);
         }
         // Biến tạm giữ tên blob để rollback nếu cần
-        String uploadedImageBlobName = null;
+        String uploadedImageBlobName;
         uploadedImageBlobName = azureService.upload(quizAnswerRequest.getImgAnswer());
         quizAnswer.setImgAnswer(uploadedImageBlobName); // Set đường dẫn blob vào QuizAnswer
         // Lưu lại quizAnswer với thông tin ảnh đã upload
@@ -92,6 +94,28 @@ public class QuizAnswerServiceImpl implements IQuizAnswerService {
         QuizAnswer quizAnswer = findQuizAnswerById(quizAnswerRequest.getId());
         quizAnswerMapper.updateFromRequest(quizAnswerRequest, quizAnswer);
         return quizAnswerMapper.entityToResponse(quizAnswerRepo.saveAndFlush(quizAnswer));
+    }
+
+    @Override
+    public void deleteByCustomQuizId(Long customQuizId) {
+        List<QuizAnswer> quizAnswers = quizAnswerRepo.findByCustomQuizId(customQuizId);
+        quizAnswers.forEach(quizAnswer -> {
+            String imgAnswer = quizAnswer.getImgAnswer();
+            quizAnswerRepo.delete(quizAnswer);
+            if (imgAnswer != null && !imgAnswer.isEmpty()) {
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (status == TransactionSynchronization.STATUS_COMMITTED) {
+                            // Xóa ảnh đã upload nếu transaction thành công
+                            azureService.deleteBlob(imgAnswer);
+                            log.info("Transaction committed successfully, image file deleted: {}", imgAnswer);
+                        }
+                    }
+                });
+            }
+        });
+
     }
 
     private QuizAnswer findQuizAnswerById(Long id) {

@@ -1,6 +1,6 @@
 package lap_english.mapper;
 
-import lap_english.dto.QuizAnswerResponse;
+import lap_english.dto.response.QuizAnswerResponse;
 import lap_english.dto.request.QuizAnswerRequest;
 import lap_english.entity.QuizAnswer;
 import org.mapstruct.Mapper;

@@ -10,6 +10,6 @@ public interface IExerciseGrammarService {
 
     ExerciseGrammarResponse save(ExerciseGrammarRequest exerciseGrammarRequest);
 
-    PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] exercises);
+    PageResponse<?> getByGrammaticalStructureId(Long grammaticalStructureId, Integer page, Integer size);
 
 }
