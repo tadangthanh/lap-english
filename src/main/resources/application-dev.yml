@@ -43,3 +43,17 @@ azure:
     connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
     account-key:
     account-name:
+
+springdoc:
+  api-docs:
+    enabled: true
+    swagger-ui:
+      enabled: true
+
+#open:
+#  api:
+#    title: ${API_TITLE:DUMMY API}
+#    description: Description of the API
+#    version: 1.0.0
+#    serverUrl: http://localhost:${server.port}
+#    serverName: server test

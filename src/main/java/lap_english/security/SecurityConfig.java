@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +38,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             "/auth/**",
             "/ws/**",
             "/api/blob/**",
+            "/swagger-ui/*"
     };
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -74,7 +76,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         authorizeRequests
                                 .requestMatchers(WHITE_LIST).permitAll()
                                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER")
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 ).sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(provider()).addFilterBefore(preFilter, UsernamePasswordAuthenticationFilter.class);
         http.httpBasic(AbstractHttpConfigurer::disable);
@@ -83,6 +85,12 @@ public class SecurityConfig implements WebMvcConfigurer {
         });
         return http.build();
     }
+    // ignore actuator and swagger
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html");
+    }
+
 
     // cung cap truy cap toi tang dao
     @Bean

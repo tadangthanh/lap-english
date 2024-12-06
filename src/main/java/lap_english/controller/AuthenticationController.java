@@ -1,5 +1,7 @@
 package lap_english.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lap_english.dto.request.AuthRequest;
 import lap_english.dto.response.ResponseData;
 import lap_english.dto.response.TokenResponse;
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "Authentication controller", description = "APIs for authentication")
 public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
+    @Operation(summary = "Truy cập để lấy token ", description = "Add new user to database")
     @PostMapping("/access")
     public ResponseData<TokenResponse> login(@Validated @RequestBody AuthRequest authRequest) {
         return new ResponseData<>(HttpStatus.OK.value(), "Login success", authenticationService.login(authRequest));
