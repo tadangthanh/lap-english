@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
-    @Operation(summary = "Truy cập để lấy token ", description = "Add new user to database")
+    @Operation(summary = "Login", description = "nhap tai khoan va mat khau de lay token")
     @PostMapping("/access")
     public ResponseData<TokenResponse> login(@Validated @RequestBody AuthRequest authRequest) {
         return new ResponseData<>(HttpStatus.OK.value(), "Login success", authenticationService.login(authRequest));
@@ -37,11 +37,11 @@ public class AuthenticationController {
     public String logout() {
         return "logout sucess";
     }
-
-    @PostMapping({"/verify-token"})
-    public ResponseData<?> verifyToken(@RequestHeader("Access-Token") String token) {
-        this.authenticationService.verifyToken(token);
-        return new ResponseData<>(HttpStatus.OK.value(), "Token is valid", null);
-    }
+//    @Operation(summary = "Truy cập để lấy token ", description = "Add new user to database")
+//    @PostMapping({"/verify-token"})
+//    public ResponseData<?> verifyToken(@RequestHeader("Access-Token") String token) {
+//        this.authenticationService.verifyToken(token);
+//        return new ResponseData<>(HttpStatus.OK.value(), "Token is valid", null);
+//    }
 }
 

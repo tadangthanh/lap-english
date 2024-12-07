@@ -5,6 +5,7 @@ import lap_english.dto.response.PageResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface IWordService {
@@ -14,9 +15,9 @@ public interface IWordService {
 
     WordDto update(WordDto dto);
 
-    PageResponse<?> getBySubTopicId(Long subTopicId, Integer page, Integer size);
+    PageResponse<List<WordDto>> getBySubTopicId(Long subTopicId, Integer page, Integer size);
 
-    PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] word);
+    PageResponse<List<WordDto>> advanceSearchBySpecification(Pageable pageable, String[] word);
 
     void deleteBySubTopicId(Long subTopicId);
 

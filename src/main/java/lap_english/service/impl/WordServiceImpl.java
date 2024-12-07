@@ -96,7 +96,9 @@ public class WordServiceImpl implements IWordService {
         word = wordRepo.saveAndFlush(word);
         uploadAudio(word, "en-GB", SsmlVoiceGender.FEMALE);
         uploadAudio(word, "en-US", SsmlVoiceGender.MALE);
-        uploadImage(dto.getFile(), word);
+        if (dto.getFile() != null && dto.getFile().getSize()>0) {
+            uploadImage(dto.getFile(), word);
+        }
         return wordMapper.toDto(word);
     }
 
@@ -175,11 +177,11 @@ public class WordServiceImpl implements IWordService {
     }
 
     @Override
-    public PageResponse<?> getBySubTopicId(Long subTopicId, Integer page, Integer size) {
+    public PageResponse<List<WordDto>> getBySubTopicId(Long subTopicId, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Word> wordPage = wordRepo.findBySubTopicId(subTopicId, pageRequest);
         List<WordDto> wordDtoList = wordMapper.toListDto(wordPage.getContent());
-        return PageResponse.builder()
+        return PageResponse.<List<WordDto>>builder()
                 .items(wordDtoList)
                 .totalItems(wordPage.getTotalElements())
                 .totalPage(wordPage.getTotalPages())
@@ -189,7 +191,7 @@ public class WordServiceImpl implements IWordService {
     }
 
     @Override
-    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] word) {
+    public PageResponse<List<WordDto>> advanceSearchBySpecification(Pageable pageable, String[] word) {
         log.info("request get all of word with specification");
         if (word != null && word.length > 0) {
             EntitySpecificationsBuilder<Word> builder = new EntitySpecificationsBuilder<>();
@@ -256,8 +258,17 @@ public class WordServiceImpl implements IWordService {
     }
 
 
-    private PageResponse<?> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
+    private PageResponse<List<WordDto>> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
         List<WordDto> response = wordPage.stream().map(this.wordMapper::toDto).collect(toList());
-        return PageResponse.builder().items(response).totalItems(wordPage.getTotalElements()).totalPage(wordPage.getTotalPages()).hasNext(wordPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        // Chỉ rõ kiểu dữ liệu là List<WordDto> khi gọi builder
+        return PageResponse.<List<WordDto>>builder()
+                .items(response)
+                .totalItems(wordPage.getTotalElements())
+                .totalPage(wordPage.getTotalPages())
+                .hasNext(wordPage.hasNext())
+                .pageNo(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .build();
     }
+
 }
