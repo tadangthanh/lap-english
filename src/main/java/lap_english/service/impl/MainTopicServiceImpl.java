@@ -60,12 +60,12 @@ public class MainTopicServiceImpl implements IMainTopicService {
 
     @Override
     public MainTopicDto update(MainTopicDto mainTopicDto) {
-        checkExist(mainTopicDto.getName());
         MainTopic mainTopicExist = mainTopicRepo.findById(mainTopicDto.getId()).orElseThrow(() -> {
             log.error("Main Topic not found");
             return new ResourceNotFoundException("Main Topic not found");
         });
         mainTopicExist.setName(mainTopicDto.getName());
+        mainTopicExist.setWord(mainTopicDto.isWord());
         return mainTopicMapper.toDto(mainTopicExist);
     }
 

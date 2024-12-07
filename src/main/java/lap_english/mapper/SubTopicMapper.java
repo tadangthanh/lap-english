@@ -15,8 +15,12 @@ public interface SubTopicMapper {
     @Mapping(target = "mainTopicName", source = "mainTopic.name")
     @Mapping(target = "mainTopicId", source = "mainTopic.id")
     @Mapping(target = "blobName", source = "blobName")
+//    @Mapping(target = "isWord", source = "isWord")
+//    @Mapping(target = "isSentence", source = "isSentence")
     SubTopicDto toDto(SubTopic entity);
 
+//    @Mapping(target = "isWord", source = "isWord")
+//    @Mapping(target = "isSentence", source = "isSentence")
     SubTopic toEntity(SubTopicDto dto);
 
 

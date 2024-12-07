@@ -28,4 +28,5 @@ public class SubTopicDto extends BaseDto {
     private Date lastLearnDate;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date completedDate;
+    private boolean word;
 }

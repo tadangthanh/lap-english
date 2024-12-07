@@ -21,4 +21,6 @@ public class MainTopic extends BaseEntity {
     private String name;
     @OneToMany(mappedBy = "mainTopic", cascade = CascadeType.ALL)
     private Set<SubTopic> subTopics;
+
+    private boolean isWord;
 }

@@ -17,7 +17,6 @@ import lombok.Setter;
 @Table(name = "quiz_answer") // câu trả lời của bài quiz
 public class QuizAnswer extends BaseEntity {
     private String answer;
-
     private boolean isCorrect;
     private String imgAnswer;
     @ManyToOne
