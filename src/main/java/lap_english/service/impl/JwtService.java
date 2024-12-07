@@ -24,13 +24,13 @@ public class JwtService {
     public String generateToken(User user) {
         Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes());
         String role = user.getRole().getName();
-        return JWT.create().withSubject(user.getUsername()).withClaim("role", role).withClaim("id", user.getId()).withExpiresAt(new Date(System.currentTimeMillis() + 3600000L)).sign(algorithm);
+        return JWT.create().withSubject(user.getUsername()).withClaim("role", role).withClaim("id", user.getId()).withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_REFRESH)).sign(algorithm);
     }
 
     public String generateRefreshToken(User user) {
         Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes());
         String role = user.getRole().getName();
-        return JWT.create().withSubject(user.getUsername()).withClaim("role", role).withExpiresAt(new Date(System.currentTimeMillis() + 2592000000L)).sign(algorithm);
+        return JWT.create().withSubject(user.getUsername()).withClaim("role", role).withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_REFRESH)).sign(algorithm);
     }
 
     public String extractRole(String token) {

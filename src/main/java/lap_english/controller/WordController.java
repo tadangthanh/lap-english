@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Null;
 import lap_english.dto.WordDto;
 import lap_english.dto.response.PageResponse;
 import lap_english.dto.response.ResponseData;
@@ -44,7 +45,7 @@ public class WordController {
     }
     @Operation(summary = "Xóa word theo id ", description = "không return về gì")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Thành công, ko return giá trị  "),
+            @ApiResponse(responseCode = "204", description = "Thành công, ko return giá trị"),
             @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),

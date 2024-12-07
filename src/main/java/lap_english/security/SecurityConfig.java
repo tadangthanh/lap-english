@@ -74,8 +74,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         http.csrf(AbstractHttpConfigurer::disable) //mat giao dien login
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers(WHITE_LIST).permitAll()
-                                .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER")
+//                                .requestMatchers(WHITE_LIST).permitAll()
+//                                .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER")
                                 .anyRequest().permitAll()
                 ).sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(provider()).addFilterBefore(preFilter, UsernamePasswordAuthenticationFilter.class);

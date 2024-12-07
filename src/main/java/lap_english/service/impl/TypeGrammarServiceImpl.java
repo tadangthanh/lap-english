@@ -62,8 +62,13 @@ public class TypeGrammarServiceImpl implements ITypeGrammarService {
         return typeGrammarMapper.toDto(typeGrammarExist);
     }
 
+    private PageResponse<List<TypeGrammarDto>> convertToPageResponse(Page<TypeGrammar> typeGrammarPage, Pageable pageable) {
+        List<TypeGrammarDto> response = typeGrammarPage.stream().map(this.typeGrammarMapper::toDto).collect(toList());
+        return PageResponse.<List<TypeGrammarDto>>builder().items(response).totalItems(typeGrammarPage.getTotalElements()).totalPage(typeGrammarPage.getTotalPages()).hasNext(typeGrammarPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+    }
+
     @Override
-    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] typeGrammars) {
+    public PageResponse<List<TypeGrammarDto>> advanceSearchBySpecification(Pageable pageable, String[] typeGrammars) {
         if (typeGrammars != null && typeGrammars.length > 0) {
             EntitySpecificationsBuilder<TypeGrammar> builder = new EntitySpecificationsBuilder<>();
             Pattern pattern = Pattern.compile(SearchUtil.REGEX_SEARCH);
@@ -79,11 +84,6 @@ public class TypeGrammarServiceImpl implements ITypeGrammarService {
             return convertToPageResponse(typeGrammarPage, pageable);
         }
         return convertToPageResponse(typeGrammarRepo.findAll(pageable), pageable);
-    }
-
-    private PageResponse<?> convertToPageResponse(Page<TypeGrammar> typeGrammarPage, Pageable pageable) {
-        List<TypeGrammarDto> response = typeGrammarPage.stream().map(this.typeGrammarMapper::toDto).collect(toList());
-        return PageResponse.builder().items(response).totalItems(typeGrammarPage.getTotalElements()).totalPage(typeGrammarPage.getTotalPages()).hasNext(typeGrammarPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 
     private TypeGrammar findTypeGrammarById(Long id) {
