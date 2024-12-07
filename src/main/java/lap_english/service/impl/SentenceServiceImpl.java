@@ -94,15 +94,15 @@ public class SentenceServiceImpl implements ISentenceService {
     }
 
     @Override
-    public PageResponse<?> getBySubTopicId(Long subTopicId, int page, int size) {
+    public PageResponse<List<SentenceDto>> getBySubTopicId(Long subTopicId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Sentence> sentencePage = sentenceRepo.findBySubTopicId(subTopicId, pageRequest);
         List<SentenceDto> sentenceDtoList = sentenceMapper.toListDto(sentencePage.getContent());
-        return PageResponse.builder().items(sentenceDtoList).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(page).pageSize(size).build();
+        return PageResponse.<List<SentenceDto>>builder().items(sentenceDtoList).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
-    public PageResponse<?> advancedSearch(Pageable pageable, String[] sentence) {
+    public PageResponse<List<SentenceDto>> advancedSearch(Pageable pageable, String[] sentence) {
         if (sentence != null && sentence.length > 0) {
             EntitySpecificationsBuilder<Sentence> builder = new EntitySpecificationsBuilder<>();
             Pattern pattern = Pattern.compile("([a-zA-Z0-9_.]+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)");
@@ -144,8 +144,8 @@ public class SentenceServiceImpl implements ISentenceService {
     }
 
 
-    private PageResponse<?> convertToPageResponse(Page<Sentence> sentencePage, Pageable pageable) {
+    private PageResponse<List<SentenceDto>> convertToPageResponse(Page<Sentence> sentencePage, Pageable pageable) {
         List<SentenceDto> response = sentencePage.stream().map(this.sentenceMapper::toDto).collect(toList());
-        return PageResponse.builder().items(response).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        return PageResponse.<List<SentenceDto>>builder().items(response).totalItems(sentencePage.getTotalElements()).totalPage(sentencePage.getTotalPages()).hasNext(sentencePage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }

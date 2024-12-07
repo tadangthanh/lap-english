@@ -16,5 +16,5 @@ public interface IMainTopicService {
     PageResponse<?> getPage(int page, int size);
     List<MainTopicDto> getAll();
 
-    PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] mainTopic);
+    PageResponse<List<MainTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] mainTopic);
 }

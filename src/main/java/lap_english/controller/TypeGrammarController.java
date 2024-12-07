@@ -34,6 +34,7 @@ public class TypeGrammarController {
     public ResponseData<TypeGrammarDto> createTypeGrammar(@Validated @RequestBody TypeGrammarDto typeGrammarDto) {
         return new ResponseData<>(HttpStatus.CREATED.value(), "success", typeGrammarService.create(typeGrammarDto));
     }
+
     @Operation(summary = "Update theo id", description = "Trả về đối tượng vừa update")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về đối tượng  vừa update "),
@@ -46,6 +47,7 @@ public class TypeGrammarController {
         typeGrammarDto.setId(id);
         return new ResponseData<>(HttpStatus.OK.value(), "success", typeGrammarService.update(typeGrammarDto));
     }
+
     @Operation(summary = "delete theo id", description = "ko tra ve gi ca")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, ko return gi het"),
@@ -58,6 +60,7 @@ public class TypeGrammarController {
         typeGrammarService.delete(id);
         return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
+
     @Operation(summary = "lay Type grammar theo id", description = "return doi tuong tim thay")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, ko return gi het"),
@@ -69,6 +72,7 @@ public class TypeGrammarController {
     public ResponseData<TypeGrammarDto> getTypeGrammar(@PathVariable Long id) {
         return new ResponseData<>(HttpStatus.OK.value(), "success", typeGrammarService.findById(id));
     }
+
     @Operation(summary = "lấy theo trang, tìm kiếm theo trang ", description = "trả về 1 page các đối tượng  ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 page"),

@@ -96,7 +96,7 @@ public class WordServiceImpl implements IWordService {
         word = wordRepo.saveAndFlush(word);
         uploadAudio(word, "en-GB", SsmlVoiceGender.FEMALE);
         uploadAudio(word, "en-US", SsmlVoiceGender.MALE);
-        if (dto.getFile() != null && dto.getFile().getSize()>0) {
+        if (dto.getFile() != null) {
             uploadImage(dto.getFile(), word);
         }
         return wordMapper.toDto(word);

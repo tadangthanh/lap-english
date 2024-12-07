@@ -90,7 +90,7 @@ public class MainTopicServiceImpl implements IMainTopicService {
     }
 
     @Override
-    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] mainTopic) {
+    public PageResponse<List<MainTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] mainTopic) {
         if (mainTopic != null && mainTopic.length > 0) {
             EntitySpecificationsBuilder<MainTopic> builder = new EntitySpecificationsBuilder<>();
             Pattern pattern = Pattern.compile("(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)"); //?page=0&size=10&sort=id,desc&subtopic=name~d
@@ -108,8 +108,8 @@ public class MainTopicServiceImpl implements IMainTopicService {
         return convertToPageResponse(mainTopicRepo.findAll(pageable), pageable);
     }
 
-    private PageResponse<?> convertToPageResponse(Page<MainTopic> mainTopicPage, Pageable pageable) {
+    private PageResponse<List<MainTopicDto>> convertToPageResponse(Page<MainTopic> mainTopicPage, Pageable pageable) {
         List<MainTopicDto> response = mainTopicPage.stream().map(this.mainTopicMapper::toDto).collect(toList());
-        return PageResponse.builder().items(response).totalItems(mainTopicPage.getTotalElements()).totalPage(mainTopicPage.getTotalPages()).hasNext(mainTopicPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        return PageResponse.<List<MainTopicDto>>builder().items(response).totalItems(mainTopicPage.getTotalElements()).totalPage(mainTopicPage.getTotalPages()).hasNext(mainTopicPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }

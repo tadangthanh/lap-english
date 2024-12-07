@@ -66,7 +66,7 @@ public class GrammaticalStructureServiceImpl implements IGrammaticalStructureSer
     }
 
     @Override
-    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] grammaticalStructure) {
+    public PageResponse<List<GrammaticalStructureDto>> advanceSearchBySpecification(Pageable pageable, String[] grammaticalStructure) {
         if (grammaticalStructure != null && grammaticalStructure.length > 0) {
             EntitySpecificationsBuilder<GrammaticalStructure> builder = new EntitySpecificationsBuilder<>();
             Pattern pattern = Pattern.compile(REGEX_SEARCH);
@@ -90,9 +90,9 @@ public class GrammaticalStructureServiceImpl implements IGrammaticalStructureSer
         grammaticalStructureRepo.deleteAll(grammaticalStructures);
     }
 
-    private PageResponse<?> convertToPageResponse(Page<GrammaticalStructure> grammaticalStructurePage, Pageable pageable) {
+    private PageResponse<List<GrammaticalStructureDto>> convertToPageResponse(Page<GrammaticalStructure> grammaticalStructurePage, Pageable pageable) {
         List<GrammaticalStructureDto> response = grammaticalStructurePage.stream().map(this.grammaticalStructureMapper::toDto).collect(toList());
-        return PageResponse.builder().items(response).totalItems(grammaticalStructurePage.getTotalElements()).totalPage(grammaticalStructurePage.getTotalPages()).hasNext(grammaticalStructurePage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        return PageResponse.<List<GrammaticalStructureDto>>builder().items(response).totalItems(grammaticalStructurePage.getTotalElements()).totalPage(grammaticalStructurePage.getTotalPages()).hasNext(grammaticalStructurePage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 
     private GrammaticalStructure findByGrammaticalStructureId(Long id) {

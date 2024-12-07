@@ -67,6 +67,8 @@ public class WordController {
         wordDto.setId(id);
         return new ResponseData<>(HttpStatus.OK.value(), "success", wordService.update(wordDto));
     }
+
+
     @Operation(summary = "lấy danh sách word theo subtopicId truyền vào ", description = "trả về 1 page  các đối tượng  ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 page word "),
@@ -89,13 +91,17 @@ public class WordController {
                                                           @RequestParam(required = false, value = "word") String[] word) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", wordService.advanceSearchBySpecification(pageable,word));
     }
+
+    @Operation(summary = "import file excel theo dinh dang quy dinh", description = "không trả về gì cả, chỉ thông báo xử lý file")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 ", description = "Thành công"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping("/import/{subTopicId}")
     public ResponseData<CompletableFuture<Integer>> importWordExcel(@PathVariable @Min(1) Long subTopicId, @RequestPart("file") MultipartFile file) {
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
-        }catch (Exception e){
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
-        }
+        return new ResponseData<>(HttpStatus.CREATED.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
     }
 
 }

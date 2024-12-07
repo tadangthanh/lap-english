@@ -5,6 +5,7 @@ import lap_english.dto.response.PageResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface ISentenceService {
@@ -18,9 +19,9 @@ public interface ISentenceService {
 
     SentenceDto update(SentenceDto sentenceDto);
 
-    PageResponse<?> getBySubTopicId(Long subTopicId, int page, int size);
+    PageResponse<List<SentenceDto>> getBySubTopicId(Long subTopicId, int page, int size);
 
-    PageResponse<?> advancedSearch(Pageable pageable, String[] sentence);
+    PageResponse<List<SentenceDto>> advancedSearch(Pageable pageable, String[] sentence);
     CompletableFuture<Integer> importFromExcel(Long subTopicId, MultipartFile file);
 
 }

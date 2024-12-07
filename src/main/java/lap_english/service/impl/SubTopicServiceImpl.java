@@ -150,11 +150,11 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     @Override
-    public PageResponse<?> getByMainTopicId(Long mainTopicId, int page, int size) {
+    public PageResponse<List<SubTopicDto>> getByMainTopicId(Long mainTopicId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<SubTopic> subTopicPage = subTopicRepo.findByMainTopicId(mainTopicId, pageRequest);
         List<SubTopicDto> subTopicDtos = subTopicMapper.toListDto(subTopicPage.getContent());
-        return PageResponse.builder().items(subTopicDtos).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(page).pageSize(size).build();
+        return PageResponse.<List<SubTopicDto>>builder().items(subTopicDtos).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(page).pageSize(size).build();
     }
 
     @Override
@@ -169,7 +169,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     @Override
-    public PageResponse<?> advanceSearchBySpecification(Pageable pageable, String[] subTopic) {
+    public PageResponse<List<SubTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] subTopic) {
         log.info("request get all of sub topic with specification");
         if (subTopic != null && subTopic.length > 0) {
             EntitySpecificationsBuilder<SubTopic> builder = new EntitySpecificationsBuilder<SubTopic>();
@@ -205,11 +205,11 @@ public class SubTopicServiceImpl implements ISubTopicService {
         return subTopicDto;
     }
 
-    private PageResponse<?> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
+    private PageResponse<List<SubTopicDto>> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
         List<SubTopicDto> response = subTopicPage.stream().map(this.subTopicMapper::toDto).collect(toList());
         response.forEach(subTopicDto -> {
             subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
         });
-        return PageResponse.builder().items(response).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        return PageResponse.<List<SubTopicDto>>builder().items(response).totalItems(subTopicPage.getTotalElements()).totalPage(subTopicPage.getTotalPages()).hasNext(subTopicPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 }
