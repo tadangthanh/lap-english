@@ -50,10 +50,10 @@ springdoc:
     swagger-ui:
       enabled: true
 
-#open:
-#  api:
-#    title: ${API_TITLE:DUMMY API}
-#    description: Description of the API
-#    version: 1.0.0
-#    serverUrl: http://localhost:${server.port}
-#    serverName: server test
+open:
+  api:
+    title: ${API_TITLE:DUMMY API}
+    description: Description of the API
+    version: 1.0.0
+    serverUrl: http://localhost:${server.port}
+    serverName: server test
