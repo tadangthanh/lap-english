@@ -18,11 +18,12 @@ public interface ISubTopicService {
 
     PageResponse<List<SubTopicDto>> getByMainTopicId(Long mainTopicId, int page, int size);
 
-    PageResponse<?> findByName(String name, int page, int size, String sort);
+    PageResponse<List<SubTopicDto>> findByName(String name, int page, int size, String sort);
 
     PageResponse<List<SubTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] subTopic);
 
     void deleteByMainTopicId(Long mainTopicId);
 
     SubTopicDto getById(Long id);
+    SubTopicDto complete(Long id);
 }

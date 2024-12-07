@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
+
 @Setter
 @Getter
 public class SubTopicDto extends BaseDto {
@@ -21,4 +23,9 @@ public class SubTopicDto extends BaseDto {
     @NotNull(message = "mainTopicId is required", groups = {Create.class})
     private Long mainTopicId;
     private int wordCount;
+    private boolean isLearned;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date lastLearnDate;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date completedDate;
 }
