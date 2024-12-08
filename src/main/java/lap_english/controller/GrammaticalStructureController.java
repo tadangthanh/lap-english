@@ -64,7 +64,7 @@ public class GrammaticalStructureController {
     @DeleteMapping("/{id}")
     public ResponseData<Void> delete(@PathVariable("id") Long id) {
         grammaticalStructureService.delete(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "success", null);
+        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
 
     @Operation(summary = "lấy page gramtical structure ", description = "Trả về danh sách   gramtical structure  theo page")

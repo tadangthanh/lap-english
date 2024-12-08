@@ -1,6 +1,7 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
+import lap_english.dto.GrammaticalStructureDto;
 import lap_english.dto.request.CustomQuizRequest;
 import lap_english.dto.request.ExerciseGrammarRequest;
 import lap_english.dto.response.CustomQuizResponse;
@@ -87,7 +88,7 @@ public class ExerciseGrammarServiceImpl implements IExerciseGrammarService {
     }
 
     @Override
-    public PageResponse<?> getByGrammaticalStructureId(Long grammaticalStructureId, Integer page, Integer size) {
+    public PageResponse<List<ExerciseGrammarResponse>> getByGrammaticalStructureId(Long grammaticalStructureId, Integer page, Integer size) {
         // lay danh sach excercise cua grammaticalstructure
         PageRequest pageable = PageRequest.of(page, size);
         Page<ExerciseGrammar> exerciseGrammarPage = exerciseGrammarRepo.findByGrammaticalStructureId(grammaticalStructureId, pageable);
@@ -99,7 +100,7 @@ public class ExerciseGrammarServiceImpl implements IExerciseGrammarService {
             CustomQuizResponse customQuizResponse = customQuizService.getByExerciseGrammarId(e.getId());
             e.setCustomQuiz(customQuizResponse);
         });
-        return PageResponse.builder().items(exerciseGrammarResponses).totalItems(exerciseGrammarPage.getTotalElements()).totalPage(exerciseGrammarPage.getTotalPages()).hasNext(exerciseGrammarPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
+        return PageResponse.<List<ExerciseGrammarResponse>>builder().items(exerciseGrammarResponses).totalItems(exerciseGrammarPage.getTotalElements()).totalPage(exerciseGrammarPage.getTotalPages()).hasNext(exerciseGrammarPage.hasNext()).pageNo(pageable.getPageNumber()).pageSize(pageable.getPageSize()).build();
     }
 
     @Override

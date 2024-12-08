@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lap_english.dto.GrammaticalStructureDto;
 import lap_english.dto.request.ExerciseGrammarRequest;
+import lap_english.dto.response.ExerciseGrammarResponse;
+import lap_english.dto.response.PageResponse;
 import lap_english.dto.response.ResponseData;
 import lap_english.exception.ErrorObjectDetails;
 import lap_english.service.IExerciseGrammarService;
@@ -14,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,9 +47,9 @@ public class ExerciseGrammarController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @GetMapping("/grammatical-structure/{grammaticalStructureId}")
-    public ResponseData<?> getByGrammaticalStructureId(@PathVariable("grammaticalStructureId") Long grammaticalStructureId,
-                                                       @RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
+    public ResponseData<PageResponse<List<ExerciseGrammarResponse>>> getByGrammaticalStructureId(@PathVariable("grammaticalStructureId") Long grammaticalStructureId,
+                                                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                                                 @RequestParam(defaultValue = "10") int size) {
         return new ResponseData<>(HttpStatus.OK.value(), "success", exerciseGrammarService.getByGrammaticalStructureId(grammaticalStructureId, page, size));
     }
     @Operation(summary = "delete theo id", description = "ko tra ve gi ca")
