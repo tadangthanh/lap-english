@@ -93,4 +93,16 @@ public class GrammaticalStructureController {
             @RequestParam(required = false, value = "grammaticalStructure") String[] grammaticalStructure) {
         return new ResponseData<>(HttpStatus.OK.value(), "success", grammaticalStructureService.advanceSearchBySpecification(pageable, grammaticalStructure));
     }
+
+    @Operation(summary = "lay theo id", description = "lay theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công, return doi tuong"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping("/{id}")
+    public ResponseData<GrammaticalStructureDto> getById(@PathVariable("id") Long id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "success", grammaticalStructureService.findById(id));
+    }
 }

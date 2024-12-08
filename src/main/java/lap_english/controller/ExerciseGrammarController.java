@@ -33,10 +33,10 @@ public class ExerciseGrammarController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
-            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.",useReturnTypeSchema = false)})
     @PostMapping
-    public ResponseData<?> save(@Validated(Create.class) @RequestBody ExerciseGrammarRequest exerciseGrammarRequest) {
-        return new ResponseData<>(HttpStatus.CREATED.value(), "success", exerciseGrammarService.save(exerciseGrammarRequest));
+    public ResponseData<ExerciseGrammarResponse> save(@ModelAttribute ExerciseGrammarRequest request) {
+        return new ResponseData<>(HttpStatus.CREATED.value(), "success", exerciseGrammarService.save(request));
     }
 
     @Operation(summary = "lấy page exercise theo id của grammaticalstructure  ", description = "Trả về danh sách exercise theo page")
