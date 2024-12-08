@@ -26,10 +26,10 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info().title(title)
                 .description(description)
                 .version(version)
-                .license(new License().name("API License").url("http://domain.vn/lisicene"))).servers(List.of(new Server().url(serverUrl).description(serverName)));
+                .license(new License().name("API License").url("http://domain.vn/lisicene"))).servers(List.of(new Server().url(serverUrl).description(serverName)))
         // them authentication bearer
-//                .components(new Components().addSecuritySchemes("bearer-auth", new SecurityScheme().type(SecurityScheme.Type.HTTP)
-//                        .scheme("bearer").bearerFormat("JWT"))).security(List.of(new SecurityRequirement().addList("bearer-auth")));
+                .components(new Components().addSecuritySchemes("bearer-auth", new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer").bearerFormat("JWT"))).security(List.of(new SecurityRequirement().addList("bearer-auth")));
     }
 
     @Bean
