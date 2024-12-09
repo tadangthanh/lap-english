@@ -1,5 +1,6 @@
 package lap_english.dto.request;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,5 +16,6 @@ public class LoginGoogleRequest {
     private String email;
     @NotBlank(message = "name is required")
     private String name;
+    @Column(name = "json",columnDefinition = "TEXT")
     private String json;
 }
