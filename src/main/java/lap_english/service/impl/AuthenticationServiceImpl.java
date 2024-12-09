@@ -56,6 +56,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
+                .json(user.getJson())
                 .build();
     }
     private User saveUser(LoginGoogleRequest loginGoogleRequest){

@@ -63,11 +63,11 @@ public class AuthenticationController {
     }
 
     @PostMapping({"/refresh"})
-    public ResponseData<?> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
+    public ResponseData<TokenResponse> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
         return new ResponseData<>(HttpStatus.OK.value(), "refresh success", authenticationService.refreshToken(refreshToken));
     }
     @PostMapping({"/verify-token"})
-    public ResponseData<?> verifyToken(@RequestHeader("Access-Token") String token) {
+    public ResponseData<Void> verifyToken(@RequestHeader("Access-Token") String token) {
         this.authenticationService.verifyToken(token);
         return new ResponseData<>(HttpStatus.OK.value(), "Token is valid", null);
     }
