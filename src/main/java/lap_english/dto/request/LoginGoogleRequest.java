@@ -16,6 +16,5 @@ public class LoginGoogleRequest {
     private String email;
     @NotBlank(message = "name is required")
     private String name;
-    @Column(name = "json",columnDefinition = "TEXT")
     private String json;
 }
