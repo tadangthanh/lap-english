@@ -14,14 +14,15 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 public class User extends BaseEntity implements UserDetails {
-    @Column(name = "username", unique = true, nullable = false)
+    @Column(name = "username", unique = true)
     private String username;
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     private String avatar;
     private String name;
+    private String json;
     @ManyToOne
     @JoinColumn(name = "skill_id")
     private Skill skill;
