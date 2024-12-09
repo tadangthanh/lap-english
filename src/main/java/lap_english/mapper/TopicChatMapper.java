@@ -11,7 +11,6 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = IGNORE)
 public interface TopicChatMapper {
 
-    @Mapping(target = "userId", source = "user.id")
     TopicChatDto toDto(TopicChat entity);
 
     @Mapping(target = "id", ignore = true)

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TopicChatRepo extends JpaRepository<TopicChat, Long> {
+    boolean existsByUserId(Long userId);
 }

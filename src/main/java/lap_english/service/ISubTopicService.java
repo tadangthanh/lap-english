@@ -2,6 +2,7 @@ package lap_english.service;
 
 import lap_english.dto.SubTopicDto;
 import lap_english.dto.response.PageResponse;
+import lap_english.entity.SubTopic;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,5 +26,8 @@ public interface ISubTopicService {
     void deleteByMainTopicId(Long mainTopicId);
 
     SubTopicDto getById(Long id);
+
     SubTopicDto complete(Long id);
+
+    SubTopicDto unlock(Long id);
 }

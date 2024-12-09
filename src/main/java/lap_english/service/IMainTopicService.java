@@ -14,7 +14,10 @@ public interface IMainTopicService {
     MainTopicDto update(MainTopicDto mainTopicDto);
 
     PageResponse<?> getPage(int page, int size);
+
     List<MainTopicDto> getAll();
 
     PageResponse<List<MainTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] mainTopic);
+
+    MainTopicDto unLock(Long id);
 }

@@ -1,6 +1,7 @@
 package lap_english.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lap_english.validation.Create;
@@ -29,4 +30,10 @@ public class SubTopicDto extends BaseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date completedDate;
     private boolean word;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private int diamound;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private int gold;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LockStatusManager status;
 }

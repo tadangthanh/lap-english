@@ -18,7 +18,9 @@ import lombok.Setter;
 public class TopicChat extends BaseEntity {
     private String name;
     private String description;
-    private String blobName;
+    private String imgUrl;
+    private int diamond;
+    private int gold;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

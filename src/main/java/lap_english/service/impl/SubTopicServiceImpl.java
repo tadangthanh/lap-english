@@ -1,12 +1,10 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
+import lap_english.dto.LockStatusManager;
 import lap_english.dto.SubTopicDto;
 import lap_english.dto.response.PageResponse;
-import lap_english.entity.MainTopic;
-import lap_english.entity.SubTopic;
-import lap_english.entity.User;
-import lap_english.entity.UserLearnedSubTopic;
+import lap_english.entity.*;
 import lap_english.exception.DuplicateResource;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.SubTopicMapper;
@@ -48,6 +46,8 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private final IWordService wordService;
     private final UserLearnedSubTopicRepo userLearnedSubTopicRepo;
     private final UserRepo userRepo;
+    private final UserSubTopicRepo userSubTopicRepo;
+
 
     @Override
     public SubTopicDto create(SubTopicDto subTopicDto, MultipartFile file) {
@@ -57,7 +57,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         subTopic.setMainTopic(mainTopic);
         subTopic = subTopicRepo.save(subTopic);
         uploadImage(file, subTopic);
-        return subTopicMapper.toDto(subTopic);
+        return convertSubtopicToDto(subTopic);
     }
 
     private void validateSubTopic(SubTopicDto subTopicDto) {
@@ -212,6 +212,21 @@ public class SubTopicServiceImpl implements ISubTopicService {
         return convertSubtopicToDto(subTopicExist);
     }
 
+    @Override
+    public SubTopicDto unlock(Long id) {
+        User user = getCurrentUser();
+        SubTopic subTopic = findSubtopicById(id);
+        if (userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId())) {
+            return convertSubtopicToDto(subTopic);
+        }
+        UserSubTopic userSubTopic = new UserSubTopic();
+        userSubTopic.setSubTopic(subTopic);
+        userSubTopic.setUser(user);
+        userSubTopicRepo.saveAndFlush(userSubTopic);
+        return convertSubtopicToDto(subTopic);
+    }
+
+
     private PageResponse<List<SubTopicDto>> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
         List<SubTopicDto> response = subTopicPage.stream().map(this::convertSubtopicToDto).collect(toList());
         response.forEach(subTopicDto -> {
@@ -225,11 +240,19 @@ public class SubTopicServiceImpl implements ISubTopicService {
         subTopicDto.setWordCount(wordRepo.countBySubTopicId(subTopicDto.getId()));
         User currentUser = getCurrentUser();
         UserLearnedSubTopic userLearnedSubTopic = userLearnedSubTopicRepo.findByUserIdAndSubTopicId(currentUser.getId(), subTopic.getId()).orElse(null);
+        LockStatusManager status = new LockStatusManager();
+        status.setDiamound(subTopic.getDiamound());
+        status.setGold(subTopic.getGold());
+        User user = getCurrentUser();
+        status.setLocked(!userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId()));
+        subTopicDto.setStatus(status);
         if (userLearnedSubTopic == null) {
             return subTopicDto;
         }
         subTopicDto.setCompletedDate(userLearnedSubTopic.getCompletedDate());
         subTopicDto.setLearned(true);
+
+
         return subTopicDto;
     }
 

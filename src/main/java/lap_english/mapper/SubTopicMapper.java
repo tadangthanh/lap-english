@@ -15,11 +15,11 @@ public interface SubTopicMapper {
     @Mapping(target = "mainTopicName", source = "mainTopic.name")
     @Mapping(target = "mainTopicId", source = "mainTopic.id")
     @Mapping(target = "blobName", source = "blobName")
-//    @Mapping(target = "isWord", source = "isWord")
-//    @Mapping(target = "isSentence", source = "isSentence")
+    @Mapping(target = "status.diamound", source = "diamound")
+    @Mapping(target = "status.gold", source = "gold")
     SubTopicDto toDto(SubTopic entity);
 
-//    @Mapping(target = "isWord", source = "isWord")
+    //    @Mapping(target = "isWord", source = "isWord")
 //    @Mapping(target = "isSentence", source = "isSentence")
     SubTopic toEntity(SubTopicDto dto);
 
