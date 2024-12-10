@@ -6,6 +6,7 @@ import lap_english.dto.SubTopicDto;
 import lap_english.dto.response.PageResponse;
 import lap_english.entity.*;
 import lap_english.exception.DuplicateResource;
+import lap_english.exception.ResourceInUseException;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.SubTopicMapper;
 import lap_english.repository.*;
@@ -76,6 +77,10 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     @Override
     public void delete(Long id) {
+        if(isSubtopicIsUsed(id)){
+            log.error("Sub Topic is used");
+            throw new ResourceInUseException("Sub Topic is used, cannot delete");
+        }
         SubTopic subTopic = subTopicRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
         String blobName = subTopic.getBlobName();
         subTopicRepo.delete(subTopic);
@@ -95,6 +100,9 @@ public class SubTopicServiceImpl implements ISubTopicService {
                 }
             }
         });
+    }
+    private boolean isSubtopicIsUsed(Long id) {
+        return userSubTopicRepo.existsBySubTopicId(id);
     }
 
     @Override

@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserMainTopicRepo extends JpaRepository<UserMainTopic, Long> {
     boolean existsByUserIdAndMainTopicId(Long userId, Long mainTopicId);
+    boolean existsByMainTopicId(Long mainTopicId);
+
 }

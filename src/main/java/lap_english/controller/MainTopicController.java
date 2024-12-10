@@ -93,6 +93,18 @@ public class MainTopicController {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.advanceSearchBySpecification(pageable, mainTopic));
     }
 
+    @Operation(summary = "lấy tat ca maintopic ", description = "Trả về danh sách  maintopic ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 list các đối tượng "),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping("/list")
+    public ResponseData<List<MainTopicDto>> getAll() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getAll());
+    }
+
     @Operation(summary = "lấy tat ca maintopic la word", description = "Trả về danh sách  maintopic ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 list các đối tượng "),
@@ -104,6 +116,7 @@ public class MainTopicController {
     public ResponseData<List<MainTopicDto>> getAllIsWord() {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getAllMainTopicIsWord());
     }
+
     @Operation(summary = "lấy tat ca maintopic la sentence ", description = "Trả về danh sách  maintopic ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 list các đối tượng "),

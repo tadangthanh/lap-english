@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserSubTopicRepo extends JpaRepository<UserSubTopic, Long> {
+    boolean existsBySubTopicId(Long subTopicId);
     boolean existsByUserIdAndSubTopicId(Long userId, Long subTopicId);
 }

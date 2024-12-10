@@ -8,6 +8,7 @@ import lap_english.entity.MainTopic;
 import lap_english.entity.User;
 import lap_english.entity.UserMainTopic;
 import lap_english.exception.DuplicateResource;
+import lap_english.exception.ResourceInUseException;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.MainTopicMapper;
 import lap_english.repository.MainTopicRepo;
@@ -58,11 +59,19 @@ public class MainTopicServiceImpl implements IMainTopicService {
 
     @Override
     public void delete(Long id) {
+        if(isMainTopicIsUsed(id)){
+            log.error("Main Topic is used");
+            throw new ResourceInUseException("Main Topic is used, cannot delete");
+        }
         MainTopic mainTopic = findMainTopicByIdOrThrow(id);
         subTopicService.deleteByMainTopicId(id);
         mainTopicRepo.delete(mainTopic);
     }
 
+    // kiem tra xem chủ đề chính có được sử dụng o 1 bang nao khac k
+    private boolean isMainTopicIsUsed(Long id) {
+        return userMainTopicRepo.existsByMainTopicId(id);
+    }
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepo.findByEmail(email).orElseThrow(() -> {
@@ -116,6 +125,12 @@ public class MainTopicServiceImpl implements IMainTopicService {
     @Override
     public List<MainTopicDto> getAllMainTopicIsSentence() {
         List<MainTopic> mainTopics = mainTopicRepo.findAllMainTopicIsSentence();
+        return this.convertMainTopicToDto(mainTopics);
+    }
+
+    @Override
+    public List<MainTopicDto> getAll() {
+        List<MainTopic> mainTopics = mainTopicRepo.findAll();
         return this.convertMainTopicToDto(mainTopics);
     }
 

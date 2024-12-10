@@ -36,19 +36,7 @@ public class EntitySpecificationsBuilder<T> {
                     searchOperation = STARTS_WITH; // tìm kiếm bắt đầu bằng kí tự chỉ định
                 }
             }
-            if (value instanceof String) {
-                String strValue = (String) value; // Ép kiểu thành String
-                if (strValue != null && strValue.split("\\+").length > 1) {
-                    String[] arrStr= strValue.split("\\+");
-                    for(int i=0;i<arrStr.length;i++){
-                        params.add(new SpecSearchCriteria(OR_PREDICATE_FLAG, key, searchOperation,arrStr[i]));
-                    }
-                }else {
-                    params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
-                }
-                System.out.println("value: "+value);
-            }
-//            params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
+            params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
         }
         return this;
     }

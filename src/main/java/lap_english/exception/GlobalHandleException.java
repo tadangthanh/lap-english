@@ -29,7 +29,7 @@ public class GlobalHandleException extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({UploadFailureException.class, InvalidDataException.class, InvalidFileException.class})
+    @ExceptionHandler({UploadFailureException.class, InvalidDataException.class, InvalidFileException.class,ResourceInUseException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public final ResponseEntity<ErrorResponse> handleUploadFail(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
