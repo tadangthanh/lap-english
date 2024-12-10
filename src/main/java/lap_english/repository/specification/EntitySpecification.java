@@ -21,7 +21,7 @@ public class EntitySpecification <T> implements Specification<T>   {
             return builder.equal(root.get(criteria.getKey().split("\\.")[0]).get(criteria.getKey().split("\\.")[1]), criteria.getValue());
         }
         return switch (criteria.getOperation()) {
-            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue().equals("true")?true:criteria.getValue().equals("false")?false:criteria.getValue());
             case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
             case GREATER_THAN -> builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
             case LESS_THAN -> builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
