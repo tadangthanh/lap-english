@@ -40,19 +40,13 @@ public class EntitySpecificationsBuilder<T> {
                 String strValue = (String) value; // Ép kiểu thành String
                 if (strValue != null && strValue.split("\\+").length > 1) {
                     String[] arrStr= strValue.split("\\+");
-                    String predicate;
                     for(int i=0;i<arrStr.length;i++){
-                        if(i==0){
-                            predicate=orPredicate;
-                        }else{
-                            predicate=OR_PREDICATE_FLAG;
-                        }
-                        params.add(new SpecSearchCriteria(predicate, key, searchOperation,arrStr[i]));
+                        params.add(new SpecSearchCriteria(OR_PREDICATE_FLAG, key, searchOperation,arrStr[i]));
                     }
                 }else {
                     params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
                 }
-//                System.out.println("value: "+value);
+                System.out.println("value: "+value);
             }
 //            params.add(new SpecSearchCriteria(orPredicate, key, searchOperation, value));
         }

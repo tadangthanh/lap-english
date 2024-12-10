@@ -108,8 +108,14 @@ public class MainTopicServiceImpl implements IMainTopicService {
     }
 
     @Override
-    public List<MainTopicDto> getAll() {
-        List<MainTopic> mainTopics = mainTopicRepo.findAll();
+    public List<MainTopicDto> getAllMainTopicIsWord() {
+        List<MainTopic> mainTopics = mainTopicRepo.findAllMainTopicIsWord();
+        return this.convertMainTopicToDto(mainTopics);
+    }
+
+    @Override
+    public List<MainTopicDto> getAllMainTopicIsSentence() {
+        List<MainTopic> mainTopics = mainTopicRepo.findAllMainTopicIsSentence();
         return this.convertMainTopicToDto(mainTopics);
     }
 

@@ -93,16 +93,27 @@ public class MainTopicController {
         return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.advanceSearchBySpecification(pageable, mainTopic));
     }
 
-    @Operation(summary = "lấy tat ca maintopic ", description = "Trả về danh sách  maintopic ")
+    @Operation(summary = "lấy tat ca maintopic la word", description = "Trả về danh sách  maintopic ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 list các đối tượng "),
             @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
-    @GetMapping("/list")
-    public ResponseData<List<MainTopicDto>> getAll() {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getAll());
+    @GetMapping("/list/word")
+    public ResponseData<List<MainTopicDto>> getAllIsWord() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getAllMainTopicIsWord());
+    }
+    @Operation(summary = "lấy tat ca maintopic la sentence ", description = "Trả về danh sách  maintopic ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công, trả về 1 list các đối tượng "),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping("/list/sentence")
+    public ResponseData<List<MainTopicDto>> getAllIsSentence() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", mainTopicService.getAllMainTopicIsSentence());
     }
 
     @Operation(summary = "mở khóa chủ đề chính", description = "Trả về đối tượng vừa mở khóa")
