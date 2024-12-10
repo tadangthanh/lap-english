@@ -27,6 +27,6 @@ public class SubTopic extends BaseEntity {
     @OneToMany(mappedBy = "subTopic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sentence> sentences = new ArrayList<>();
     private boolean isWord;
-    private int diamound;
+    private int diamond;
     private int gold;
 }

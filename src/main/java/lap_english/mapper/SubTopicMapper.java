@@ -15,7 +15,7 @@ public interface SubTopicMapper {
     @Mapping(target = "mainTopicName", source = "mainTopic.name")
     @Mapping(target = "mainTopicId", source = "mainTopic.id")
     @Mapping(target = "blobName", source = "blobName")
-    @Mapping(target = "status.diamound", source = "diamound")
+    @Mapping(target = "status.diamond", source = "diamond")
     @Mapping(target = "status.gold", source = "gold")
     SubTopicDto toDto(SubTopic entity);
 

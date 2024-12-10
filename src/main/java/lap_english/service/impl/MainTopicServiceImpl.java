@@ -81,7 +81,7 @@ public class MainTopicServiceImpl implements IMainTopicService {
     private MainTopicDto convertMainTopicToDto(MainTopic mainTopic) {
         MainTopicDto mainTopicDto = mainTopicMapper.toDto(mainTopic);
         LockStatusManager status = new LockStatusManager();
-        status.setDiamound(mainTopic.getDiamound());
+        status.setDiamond(mainTopic.getDiamond());
         status.setGold(mainTopic.getGold());
         User user = getCurrentUser();
         status.setLocked(!userMainTopicRepo.existsByUserIdAndMainTopicId(user.getId(), mainTopic.getId()));

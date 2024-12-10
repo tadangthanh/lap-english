@@ -79,7 +79,7 @@ public class TopicChatServiceImpl implements ITopicChatService {
         TopicChatDto topicChatDto = topicChatMapper.toDto(topicChat);
         LockStatusManager lockStatusManager = new LockStatusManager();
         lockStatusManager.setLocked(!topicChatRepo.existsByUserId(topicChat.getUser().getId()));
-        lockStatusManager.setDiamound(topicChat.getDiamond());
+        lockStatusManager.setDiamond(topicChat.getDiamond());
         lockStatusManager.setGold(topicChat.getGold());
         topicChatDto.setStatus(lockStatusManager);
         return topicChatDto;

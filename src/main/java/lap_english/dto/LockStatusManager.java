@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LockStatusManager extends BaseDto {
-    private int diamound;
+    private int diamond;
     private int gold;
     private boolean isLocked;
 }

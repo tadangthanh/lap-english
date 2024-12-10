@@ -241,7 +241,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         User currentUser = getCurrentUser();
         UserLearnedSubTopic userLearnedSubTopic = userLearnedSubTopicRepo.findByUserIdAndSubTopicId(currentUser.getId(), subTopic.getId()).orElse(null);
         LockStatusManager status = new LockStatusManager();
-        status.setDiamound(subTopic.getDiamound());
+        status.setDiamond(subTopic.getDiamond());
         status.setGold(subTopic.getGold());
         User user = getCurrentUser();
         status.setLocked(!userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId()));

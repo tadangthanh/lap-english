@@ -14,7 +14,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = IGNORE)
 public interface MainTopicMapper {
 
-    @Mapping(target = "status.diamound", source = "diamound")
+    @Mapping(target = "status.diamond", source = "diamond")
     @Mapping(target = "status.gold", source = "gold")
     MainTopicDto toDto(MainTopic entity);
 
