@@ -9,8 +9,8 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class AuthRequest implements Serializable {
-    @NotBlank(message = "Username is required")
-    private String username;
+    @NotBlank(message = "email is required")
+    private String email;
     @NotBlank(message = "Password is required")
     private String password;
 }

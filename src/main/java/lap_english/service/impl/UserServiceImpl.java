@@ -23,8 +23,8 @@ public class UserServiceImpl implements IUserService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override

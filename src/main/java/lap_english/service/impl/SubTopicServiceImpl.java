@@ -262,7 +262,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepo.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userRepo.findByEmail(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private SubTopic findSubtopicById(Long id) {

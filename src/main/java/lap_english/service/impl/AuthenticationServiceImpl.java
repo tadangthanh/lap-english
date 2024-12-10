@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,8 +27,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Override
     public TokenResponse login(AuthRequest authRequest) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-            User user = userRepo.findByUsername(authRequest.getUsername())
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
+            User user = userRepo.findByEmail(authRequest.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException("Tài khoản hoặc mật khẩu không đúng"));
             String accessToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
@@ -59,13 +58,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .json(user.getJson())
                 .build();
     }
-    private User saveUser(LoginGoogleRequest loginGoogleRequest){
+
+    private User saveUser(LoginGoogleRequest loginGoogleRequest) {
         User user = new User();
         user.setEmail(loginGoogleRequest.getEmail());
         user.setUsername(loginGoogleRequest.getEmail());
         user.setName(loginGoogleRequest.getName());
         user.setJson(loginGoogleRequest.getJson());
-        Role role= roleRepo.findRoleByName("ROLE_USER").orElseThrow(()->new ResourceNotFoundException("Role not found"));
+        Role role = roleRepo.findRoleByName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         user.setRole(role);
         user = userRepo.saveAndFlush(user);
         return userRepo.saveAndFlush(user);
@@ -85,9 +85,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     public TokenResponse refreshToken(String refreshToken) {
-        String username = this.jwtService.extractUsername(refreshToken);
+        String email = this.jwtService.extractUsername(refreshToken);
         if (this.jwtService.tokenIsValid(refreshToken)) {
-            User user = this.userRepo.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            User user = this.userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
             String newAccessToken = this.jwtService.generateToken(user);
             String newRefreshToken = this.jwtService.generateRefreshToken(user);
             return TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
