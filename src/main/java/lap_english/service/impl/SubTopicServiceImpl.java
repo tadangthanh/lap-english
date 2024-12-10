@@ -77,7 +77,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     @Override
     public void delete(Long id) {
-        if(isSubtopicIsUsed(id)){
+        if (isSubtopicIsUsed(id)) {
             log.error("Sub Topic is used");
             throw new ResourceInUseException("Sub Topic is used, cannot delete");
         }
@@ -101,6 +101,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
             }
         });
     }
+
     private boolean isSubtopicIsUsed(Long id) {
         return userSubTopicRepo.existsBySubTopicId(id);
     }
