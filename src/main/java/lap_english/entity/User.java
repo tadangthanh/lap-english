@@ -22,7 +22,7 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
     private String avatar;
     private String name;
-    @Column(name = "json",columnDefinition = "TEXT")
+    @Column(name = "json", columnDefinition = "TEXT")
     private String json;
     @ManyToOne
     @JoinColumn(name = "skill_id")
