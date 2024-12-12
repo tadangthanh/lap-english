@@ -39,7 +39,7 @@ public class WordDto extends BaseDto {
     private String audioUkBlobName;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String audioUsBlobName;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String imageBlobName;
     @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -56,11 +57,9 @@ public class WordServiceImpl implements IWordService {
 
     @Override
     public void delete(Long id) {
-        Word wordExisting = wordRepo.findById(id).orElseThrow(() -> {
-            log.error("Word not found");
-            return new ResourceNotFoundException("Word not found");
-        });
-        List<String> blobNames = getListBlobWord(List.of(wordExisting));
+        Word wordExisting = findWordByIdOrThrow(id);
+        List<String> blobNames = getListBlobWordAudio(List.of(wordExisting));
+        blobNames.add(wordExisting.getImageBlobName());
         wordRepo.deleteById(id);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -72,7 +71,7 @@ public class WordServiceImpl implements IWordService {
         });
     }
 
-    private List<String> getListBlobWord(List<Word> words) {
+    private List<String> getListBlobWordAudio(List<Word> words) {
         List<String> blobNames = new ArrayList<>();
         for (Word word : words) {
             if (word.getAudioUkBlobName() != null) {
@@ -80,9 +79,6 @@ public class WordServiceImpl implements IWordService {
             }
             if (word.getAudioUsBlobName() != null) {
                 blobNames.add(word.getAudioUsBlobName());
-            }
-            if (word.getImageBlobName() != null) {
-                blobNames.add(word.getImageBlobName());
             }
         }
         return blobNames;
@@ -148,12 +144,26 @@ public class WordServiceImpl implements IWordService {
 
     @Override
     public WordDto update(WordDto dto) {
-        Word wordExist = wordRepo.findById(dto.getId()).orElseThrow(() -> {
-            log.error("Word not found");
-            return new ResourceNotFoundException("Word not found");
-        });
-        List<String> blobNames = getListBlobWord(List.of(wordExist));
+        Word wordExist = findWordByIdOrThrow(dto.getId());
+        boolean isNewWord=isNewWord(dto,wordExist);
+        // lay danh sach cac blob nhu la audio
+        List<String> blobAudio = getListBlobWordAudio(List.of(wordExist));
 
+        // neu imageblobName cua dto la null hoac rong thi xoa blob cua wordExist
+        if(dto.getImageBlobName()==null || dto.getImageBlobName().isEmpty()){
+            if(wordExist.getImageBlobName()!=null && !wordExist.getImageBlobName().trim().isEmpty()){
+                azureService.deleteBlob(wordExist.getImageBlobName());
+                wordExist.setImageBlobName(null);
+            }
+        }
+        // neu file cua dto khac null va khong rong thi xoa blob cua wordExist va upload file cua dto
+        if(dto.getFile()!=null && !dto.getFile().isEmpty()){
+            if(wordExist.getImageBlobName()!=null&& !wordExist.getImageBlobName().trim().isEmpty()){
+                azureService.deleteBlob(wordExist.getImageBlobName());
+            }
+            uploadImage(dto.getFile(),wordExist);
+            dto.setImageBlobName(wordExist.getImageBlobName());
+        }
         wordMapper.updateEntityFromDto(dto, wordExist);
         wordExist = wordRepo.save(wordExist);
         Word finalWordExist = wordExist;
@@ -161,21 +171,18 @@ public class WordServiceImpl implements IWordService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                blobNames.forEach(blobName -> deleteFileByBlobName(blobName));
-                uploadDoubleAudioUsUk(finalWordExist);
-            }
-
-            @Override
-            public void afterCompletion(int status) {
-                if (status != STATUS_COMMITTED) {
-                    // Thực hiện hành động khác nếu transaction không thành công
-                    log.error("Transaction rolled back, no file deletion.");
+                if(isNewWord){
+                    blobAudio.forEach(blobName -> deleteFileByBlobName(blobName));
+                    uploadDoubleAudioUsUk(finalWordExist);
                 }
             }
         });
-        return wordMapper.toDto(wordRepo.save(finalWordExist));
+        return wordMapper.toDto(wordRepo.saveAndFlush(finalWordExist));
     }
 
+    private boolean isNewWord(WordDto dto, Word word) {
+        return word.getWord().equals(dto.getWord()) || word.getPronounceUK().equals(dto.getPronounceUK()) || word.getPronounceUS().equals(dto.getPronounceUS());
+    }
     @Override
     public PageResponse<List<WordDto>> getBySubTopicId(Long subTopicId, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -223,7 +230,7 @@ public class WordServiceImpl implements IWordService {
     public void deleteBySubTopicId(Long subTopicId) {
         List<Word> words = wordRepo.findAllBySubTopicId(subTopicId);
         // Lấy ra tên của các file blob, sau khi commit thì xóa các file blob
-        List<String> blobNames = getListBlobWord(words);
+        List<String> blobNames = getListBlobWordAudio(words);
         wordRepo.deleteAll(words);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
@@ -257,6 +264,18 @@ public class WordServiceImpl implements IWordService {
         }
     }
 
+    @Override
+    public void deleteImage(Long id) {
+        Word word = findWordByIdOrThrow(id);
+        deleteFileByBlobName(word.getImageBlobName());
+    }
+
+    private Word findWordByIdOrThrow(Long id) {
+        return wordRepo.findById(id).orElseThrow(() -> {
+            log.error("Word not found");
+            return new ResourceNotFoundException("Word not found");
+        });
+    }
 
     private PageResponse<List<WordDto>> convertToPageResponse(Page<Word> wordPage, Pageable pageable) {
         List<WordDto> response = wordPage.stream().map(this.wordMapper::toDto).collect(toList());

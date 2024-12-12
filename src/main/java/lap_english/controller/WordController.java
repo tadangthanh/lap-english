@@ -63,7 +63,8 @@ public class WordController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PutMapping("/{id}")
-    public ResponseData<WordDto> update(@PathVariable Long id, @Validated(Update.class) @RequestBody WordDto wordDto) {
+    public ResponseData<WordDto> update(@PathVariable Long id, @Validated(Update.class) @RequestPart("data") WordDto wordDto, @RequestPart(value = "file", required = false) MultipartFile file) {
+        wordDto.setFile(file);
         wordDto.setId(id);
         return new ResponseData<>(HttpStatus.OK.value(), "success", wordService.update(wordDto));
     }
@@ -102,6 +103,19 @@ public class WordController {
     @PostMapping("/import/{subTopicId}")
     public ResponseData<CompletableFuture<Integer>> importWordExcel(@PathVariable @Min(1) Long subTopicId, @RequestPart("file") MultipartFile file) {
         return new ResponseData<>(HttpStatus.CREATED.value(), "Processing file... Please wait.", wordService.importFromExcel(subTopicId, file));
+    }
+
+    @Operation(summary = "xóa ảnh của 1 word ", description = "không trả về gì cả")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 ", description = "Thành công"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @DeleteMapping("/{id}/image")
+    public ResponseData<Void> deleteImage(@PathVariable Long id) {
+        wordService.deleteImage(id);
+        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
 
 }

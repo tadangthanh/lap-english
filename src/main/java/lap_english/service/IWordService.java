@@ -22,5 +22,6 @@ public interface IWordService {
     void deleteBySubTopicId(Long subTopicId);
 
     CompletableFuture<Integer> importFromExcel(Long subTopicId, MultipartFile file);
+    void deleteImage(Long id);
 
 }
