@@ -21,10 +21,14 @@ public interface SubTopicMapper {
 
     //    @Mapping(target = "isWord", source = "isWord")
 //    @Mapping(target = "isSentence", source = "isSentence")
+    @Mapping(target = "diamond", source = "diamond")
+    @Mapping(target = "gold", source = "gold")
     SubTopic toEntity(SubTopicDto dto);
 
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "diamond", source = "diamond")
+    @Mapping(target = "gold", source = "gold")
     void updateEntityFromDto(SubTopicDto dto, @MappingTarget SubTopic entity);
 
     List<SubTopicDto> toListDto(List<SubTopic> content);

@@ -19,6 +19,8 @@ public interface MainTopicMapper {
     MainTopicDto toDto(MainTopic entity);
 
 
+    @Mapping(target = "diamond", source = "diamond")
+    @Mapping(target = "gold", source = "gold")
     MainTopic toEntity(MainTopicDto dto);
 
 
@@ -27,5 +29,6 @@ public interface MainTopicMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "subTopics", ignore = true)
     @Mapping(target = "word", ignore = true)
+
     void updateEntityFromDto(MainTopicDto dto,@MappingTarget MainTopic entity);
 }

@@ -8,7 +8,6 @@ import lap_english.validation.Create;
 import lap_english.validation.Update;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -30,9 +29,9 @@ public class SubTopicDto extends BaseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Date completedDate;
     private boolean word;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private int diamound;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private int diamond;
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int gold;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LockStatusManager status;

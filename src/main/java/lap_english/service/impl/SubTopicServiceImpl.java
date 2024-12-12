@@ -115,8 +115,10 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
         subTopicMapper.updateEntityFromDto(subTopicDto, subTopicExist);
         subTopicExist = subTopicRepo.save(subTopicExist);
-
-
+        if(subTopicDto.getMainTopicId() !=null && !subTopicExist.getMainTopic().getId().equals(subTopicDto.getMainTopicId())){
+            MainTopic mainTopic = getMainTopicById(subTopicDto.getMainTopicId());
+            subTopicExist.setMainTopic(mainTopic);
+        }
         // Đăng ký hành động xóa file sau khi transaction commit thành công
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override

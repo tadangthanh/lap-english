@@ -11,9 +11,7 @@ public class MainTopicDto extends BaseDto {
     @NotBlank(message = "Name is required")
     private String name;
     private boolean word;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private int diamound;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private int diamond;
     private int gold;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LockStatusManager status;
