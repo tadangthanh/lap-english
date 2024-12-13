@@ -81,6 +81,10 @@ public class SubTopicServiceImpl implements ISubTopicService {
             log.error("Sub Topic is used");
             throw new ResourceInUseException("Sub Topic is used, cannot delete");
         }
+        if(userLearnedSubTopicRepo.existsBySubTopicId(id)){
+            log.error("Sub Topic is learned");
+            throw new ResourceInUseException("Sub Topic is learned by user, cannot delete");
+        }
         SubTopic subTopic = subTopicRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sub Topic not found"));
         String blobName = subTopic.getBlobName();
         subTopicRepo.delete(subTopic);

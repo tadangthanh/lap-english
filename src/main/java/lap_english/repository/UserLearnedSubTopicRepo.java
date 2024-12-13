@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserLearnedSubTopicRepo extends JpaRepository<UserLearnedSubTopic, Long> {
 
     Optional<UserLearnedSubTopic> findByUserIdAndSubTopicId(Long userId, Long subTopicId);
+    boolean existsBySubTopicId(Long subTopicId);
 }
