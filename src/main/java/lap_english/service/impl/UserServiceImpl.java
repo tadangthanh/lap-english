@@ -39,6 +39,12 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toDto(userExist);
     }
 
+    @Override
+    public String getUerJson() {
+        User currentUser = getCurrentUser();
+        return currentUser.getJson();
+    }
+
     private User findUserByIdOrThrow(Long id) {
         return userRepo.findById(id).orElseThrow(() -> {
             log.warn("User not found with id: {}", id);
