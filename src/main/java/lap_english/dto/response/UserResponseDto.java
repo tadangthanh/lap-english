@@ -16,7 +16,7 @@ public class UserResponseDto extends BaseDto {
     private String email;
     private String name;
     private String avatar;
-    private SkillDto skill;
+    private SkillDto skills;
     private List<TitleDto> titles;
     private List<DailyTaskDto> dailyTasks;
     private CumulativePointDto cumulativePoint;

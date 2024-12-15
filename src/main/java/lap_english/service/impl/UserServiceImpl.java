@@ -110,7 +110,7 @@ public class UserServiceImpl implements IUserService {
             titleDto.setTask(taskDto);
             titleDtoList.add(titleDto);
         });
-        userResponseDto.setSkill(skillMapper.toDto(currentUser.getSkill()));
+        userResponseDto.setSkills(skillMapper.toDto(currentUser.getSkill()));
         userResponseDto.setDailyTasks(dailyTaskDtoList);
         userResponseDto.setTitles(titleDtoList);
         userResponseDto.setAvatar(currentUser.getAvatar());
