@@ -15,4 +15,5 @@ public class TaskDto {
     private TypeTask type;
     private String keyFunUpdate;
     private double total;
+    private double progress;
 }

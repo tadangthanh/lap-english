@@ -89,6 +89,7 @@ public class UserServiceImpl implements IUserService {
                 rewardDto.setRewardClaimed(userDailyTask.isRewardClaimed());
                 dailyTaskDto.setReward(rewardDto);
                 TaskDto taskDto = taskMapper.toDto(dailyTask.getTask());
+                taskDto.setProgress(userDailyTask.getProgress());
                 dailyTaskDto.setTask(taskDto);
                 dailyTaskDtoList.add(dailyTaskDto);
             }
@@ -102,6 +103,7 @@ public class UserServiceImpl implements IUserService {
             rewardDto.setRewardClaimed(userTitle.isRewardClaimed());
             titleDto.setReward(rewardDto);
             TaskDto taskDto = taskMapper.toDto(userTitle.getTitle().getTask());
+            taskDto.setProgress(userTitle.getProgress());
             titleDto.setTask(taskDto);
             titleDtoList.add(titleDto);
         });
