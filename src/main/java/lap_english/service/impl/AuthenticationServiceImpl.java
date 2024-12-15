@@ -3,19 +3,20 @@ package lap_english.service.impl;
 import lap_english.dto.request.AuthRequest;
 import lap_english.dto.request.LoginGoogleRequest;
 import lap_english.dto.response.TokenResponse;
-import lap_english.entity.CumulativePoint;
-import lap_english.entity.Role;
-import lap_english.entity.User;
+import lap_english.entity.*;
 import lap_english.exception.ResourceNotFoundException;
-import lap_english.repository.CumulativePointRepo;
-import lap_english.repository.RoleRepo;
-import lap_english.repository.UserRepo;
+import lap_english.repository.*;
 import lap_english.service.IAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final UserRepo userRepo;
     private final AuthenticationManager authenticationManager;
     private final RoleRepo roleRepo;
-    private  final CumulativePointRepo cumulativePointRepo;
+    private final CumulativePointRepo cumulativePointRepo;
+    private final AccumulateRepo accumulateRepo;
+    private final SkillRepo skillRepo;
+    private final UserDailyTaskRepo userDailyTaskRepo;
+    private final TaskRepo taskRepo;
+    private final TitleRepo titleRepo;
+    private final DailyTaskRepo dailyTaskRepo;
+    private final UserTitleRepo userTitleRepo;
 
     @Override
     public TokenResponse login(AuthRequest authRequest) {
@@ -72,10 +80,90 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         user.setRole(role);
         user = userRepo.saveAndFlush(user);
 
+        //init cumulative for new user
+        CumulativePoint cumulativePoint = initCumulativePointByUser(user);
+        user.setCumulativePoint(cumulativePoint);
+
+        // init accumulate for new user
+        Accumulate accumulate = initAccumulateByUser(user);
+        user.setAccumulate(accumulate);
+
+        // init skill for new user
+        Skill skill = initSkillByUser(user);
+        user.setSkill(skill);
+
+        // init userDailyTask
+        List<UserDailyTask> userDailyTasks = initDailyTaskByUser(user);
+
+        // init title
+        List<UserTitle> userTitles= initUserTitleByUser(user);
+
+        return user;
+    }
+    private List<UserTitle> initUserTitleByUser(User user) {
+        int titleNum = 3;
+        Pageable pageable = PageRequest.of(0, titleNum);
+        List<Task> taskRandom = taskRepo.findRandomTasks(pageable);
+        List<UserTitle> userTitles = new ArrayList<>();
+        for (Task task : taskRandom) {
+            Title title = new Title();
+            title.setTask(task);
+            title.setReward(task.getReward());
+            titleRepo.saveAndFlush(title);
+            UserTitle userTitle = new UserTitle();
+            userTitle.setProgress(0);
+            userTitle.setUser(user);
+            userTitleRepo.saveAndFlush(userTitle);
+            userTitle.setRewardClaimed(false);
+        }
+        return userTitles;
+    }
+
+
+    private List<UserDailyTask> initDailyTaskByUser(User user) {
+        int dailyTaskNum = 3;
+        Pageable pageable = PageRequest.of(0, dailyTaskNum);
+        List<Task> taskRandom = taskRepo.findRandomTasks(pageable);
+        List<UserDailyTask> userDailyTasks = new ArrayList<>();
+        for (Task task : taskRandom) {
+            //init dailyTask
+            DailyTask dailyTask = new DailyTask();
+            dailyTask.setTask(task);
+            dailyTask.setReward(task.getReward());
+            dailyTaskRepo.saveAndFlush(dailyTask);
+            // init userDaily Task
+            UserDailyTask userDailyTask = new UserDailyTask();
+            userDailyTask.setUser(user);
+            userDailyTask.setDailyTask(dailyTask);
+            userDailyTask.setProgress(0);
+            userDailyTask.setRewardClaimed(false);
+            userDailyTaskRepo.saveAndFlush(userDailyTask);
+            userDailyTasks.add(userDailyTask);
+        }
+        return userDailyTasks;
+    }
+
+    private CumulativePoint initCumulativePointByUser(User user) {
         CumulativePoint cumulativePoint = new CumulativePoint();
         cumulativePoint.setUser(user);
         cumulativePointRepo.save(cumulativePoint);
-        return userRepo.saveAndFlush(user);
+        return cumulativePoint;
+    }
+
+    private Accumulate initAccumulateByUser(User user) {
+        Accumulate accumulate = new Accumulate();
+        accumulateRepo.save(accumulate);
+        return accumulate;
+    }
+
+    private Skill initSkillByUser(User user) {
+        Skill skill = new Skill();
+        skill.setListening(1);
+        skill.setSpeaking(1);
+        skill.setReading(1);
+        skill.setWriting(1);
+        skillRepo.save(skill);
+        return skill;
     }
 
     @Override

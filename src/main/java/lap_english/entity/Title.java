@@ -21,9 +21,7 @@ public class Title extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "task_id")
     private Task task;
-
     @OneToOne
     @JoinColumn(name = "reward_id")
     private Reward reward;
-
 }

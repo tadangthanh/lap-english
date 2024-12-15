@@ -57,3 +57,7 @@ open:
     version: 1.0.0
     serverUrl: http://localhost:${server.port}
     serverName: server test
+
+
+
+

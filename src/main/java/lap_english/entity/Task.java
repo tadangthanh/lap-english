@@ -1,9 +1,6 @@
 package lap_english.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +18,7 @@ public class Task extends BaseEntity{
     private TypeTask type;
     private String keyFunUpdate;
     private double total;
-
+    @OneToOne
+    @JoinColumn(name = "reward_id")
+    private Reward reward;
 }
