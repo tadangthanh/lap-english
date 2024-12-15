@@ -6,6 +6,7 @@ import lap_english.dto.response.UserResponseDto;
 import lap_english.entity.*;
 import lap_english.exception.ResourceNotFoundException;
 import lap_english.mapper.*;
+import lap_english.repository.CumulativePointRepo;
 import lap_english.repository.UserDailyTaskRepo;
 import lap_english.repository.UserRepo;
 import lap_english.repository.UserTitleRepo;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements IUserService {
     private final TitleMapper titleMapper;
     private final SkillMapper skillMapper;
     private final TaskMapper taskMapper;
+    private final CumulativePointRepo cumulativePointRepo;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -73,7 +75,7 @@ public class UserServiceImpl implements IUserService {
             userResponseDto.setAccumulate(accumulateDto);
         }
         // set cumulate point
-        CumulativePoint cumulativePoint = currentUser.getCumulativePoint();
+        CumulativePoint cumulativePoint = cumulativePointRepo.findByUserId(currentUser.getId());
         if (cumulativePoint != null) {
             CumulativePointDto pointDto = cumulativePointMapper.toDto(cumulativePoint);
             userResponseDto.setCumulativePoint(pointDto);
