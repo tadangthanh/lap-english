@@ -17,4 +17,6 @@ public class LoginGoogleRequest {
     @NotBlank(message = "name is required")
     private String name;
     private String json;
+    @NotBlank(message = "avatar is required")
+    private String avatar;
 }

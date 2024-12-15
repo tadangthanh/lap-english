@@ -93,12 +93,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         // init userDailyTask
         List<UserDailyTask> userDailyTasks = initDailyTaskByUser(user);
-
         // init title
-        List<UserTitle> userTitles= initUserTitleByUser(user);
-
+        List<UserTitle> userTitles = initUserTitleByUser(user);
+        user.setAvatar(loginGoogleRequest.getAvatar());
         return user;
     }
+
     private List<UserTitle> initUserTitleByUser(User user) {
         int titleNum = 3;
         Pageable pageable = PageRequest.of(0, titleNum);
@@ -144,14 +144,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private CumulativePoint initCumulativePointByUser(User user) {
         CumulativePoint cumulativePoint = new CumulativePoint();
+        cumulativePoint.setDiamond(0);
+        cumulativePoint.setDiamond(0);
+        cumulativePoint.setRankPoints(0);
+        cumulativePoint.setUser(user);
         cumulativePointRepo.save(cumulativePoint);
         return cumulativePoint;
     }
 
     private Accumulate initAccumulateByUser(User user) {
         Accumulate accumulate = new Accumulate();
-        accumulateRepo.save(accumulate);
-        return accumulate;
+        accumulate.setWords(0);
+        accumulate.setSentences(0);
+        accumulate.setTitles(0);
+        accumulate.setDaysLearned(0);
+        return accumulateRepo.saveAndFlush(accumulate);
     }
 
     private Skill initSkillByUser(User user) {
@@ -160,8 +167,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         skill.setSpeaking(1);
         skill.setReading(1);
         skill.setWriting(1);
-        skillRepo.save(skill);
-        return skill;
+        return skillRepo.saveAndFlush(skill);
     }
 
     @Override
