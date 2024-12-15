@@ -11,5 +11,4 @@ public class SkillDto {
     private double writing;
     private double speaking;
     private double listening;
-    private SkillType type;
 }

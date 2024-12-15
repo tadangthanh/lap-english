@@ -33,6 +33,7 @@ public class UserServiceImpl implements IUserService {
     private final RewardMapper rewardMapper;
     private final UserTitleRepo userTitleRepo;
     private final TitleMapper titleMapper;
+    private final SkillMapper skillMapper;
     private final TaskMapper taskMapper;
 
     @Override
@@ -107,10 +108,10 @@ public class UserServiceImpl implements IUserService {
             titleDto.setTask(taskDto);
             titleDtoList.add(titleDto);
         });
-
+        userResponseDto.setSkill(skillMapper.toDto(currentUser.getSkill()));
         userResponseDto.setDailyTasks(dailyTaskDtoList);
         userResponseDto.setTitles(titleDtoList);
-
+        userResponseDto.setAvatar(currentUser.getAvatar());
         return userResponseDto;
     }
 
