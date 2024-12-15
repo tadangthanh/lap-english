@@ -1,5 +1,6 @@
 package lap_english.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lap_english.entity.RewardType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,5 +14,6 @@ import lombok.Setter;
 public class RewardDto {
     private RewardType rewardType;
     private int quantity;
+    @JsonProperty("isRewardClaimed")
     private boolean isRewardClaimed;
 }
