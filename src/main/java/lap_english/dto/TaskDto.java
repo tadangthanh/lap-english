@@ -1,9 +1,6 @@
-package lap_english.entity;
+package lap_english.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import lap_english.entity.TypeTask;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,13 +10,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "task") // nhiem vu
-public class Task extends BaseEntity{
+public class TaskDto {
     private String description;
-    @Enumerated(EnumType.STRING)
     private TypeTask type;
     private String keyFunUpdate;
     private double total;
-
 }

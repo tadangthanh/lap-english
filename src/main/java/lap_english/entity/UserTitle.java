@@ -14,11 +14,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "user_daily_task")
-public class UserDailyTask extends BaseEntity{
+@Table(name = "user_title")
+public class UserTitle extends BaseEntity {
     @ManyToOne
-    @JoinColumn(name = "daily_task_id")
-    private DailyTask dailyTask;
+    @JoinColumn(name = "title_id")
+    private Title title;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

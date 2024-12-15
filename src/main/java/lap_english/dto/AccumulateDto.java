@@ -1,6 +1,5 @@
 package lap_english.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,8 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto extends BaseDto {
-    @NotBlank(message = "json is required")
-    private String json;
-
+public class AccumulateDto {
+    private int words;
+    private int daysLearned;
+    private int sentences;
+    private int titles;
 }

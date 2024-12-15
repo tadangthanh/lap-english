@@ -27,6 +27,9 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "skill_id")
     private Skill skill;
+    @OneToOne
+    @JoinColumn(name = "accumulate_id")
+    private Accumulate accumulate;
 
     @OneToOne(cascade = CascadeType.ALL)
     private CumulativePoint cumulativePoint;

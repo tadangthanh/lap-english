@@ -12,8 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "reward")// qua
-public class Reward extends BaseEntity{
-    private RewardType rewardType;
-    private int quantity;
+@Table(name = "accumulate")
+public class Accumulate extends BaseEntity {
+    private int words;
+    private int daysLearned;
+    private int sentences;
+    private int titles;
 }

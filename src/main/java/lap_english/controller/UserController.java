@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lap_english.dto.UserDto;
 import lap_english.dto.response.ResponseData;
+import lap_english.dto.response.UserResponseDto;
 import lap_english.exception.ErrorObjectDetails;
 import lap_english.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -44,5 +45,17 @@ public class UserController {
     @GetMapping("/json")
     public ResponseData<String> json() {
         return new ResponseData<>(HttpStatus.OK.value(), "success", userService.getUerJson());
+    }
+
+    @Operation(summary = "lấy user hiện tại ", description = "Trả về đối tượng")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công, trả về đối tượng "),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping
+    public ResponseData<UserResponseDto> getAuthenticationUser() {
+        return new ResponseData<>(HttpStatus.OK.value(), "success", userService.getUserDto());
     }
 }
