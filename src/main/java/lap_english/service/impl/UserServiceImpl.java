@@ -86,17 +86,20 @@ public class UserServiceImpl implements IUserService {
             if (dailyTask != null) {
                 // set task va reward cho daily task dto
                 RewardDto rewardDto = rewardMapper.toDto(dailyTask.getReward());
+                rewardDto.setRewardClaimed(userDailyTask.isRewardClaimed());
                 dailyTaskDto.setReward(rewardDto);
                 TaskDto taskDto = taskMapper.toDto(dailyTask.getTask());
                 dailyTaskDto.setTask(taskDto);
                 dailyTaskDtoList.add(dailyTaskDto);
             }
         });
+        // set titles
         List<UserTitle> userTitles = userTitleRepo.findAllByUserId(currentUser.getId());
         List<TitleDto> titleDtoList = new ArrayList<>();
         userTitles.forEach(userTitle -> {
             TitleDto titleDto = titleMapper.toDto(userTitle.getTitle());
             RewardDto rewardDto = rewardMapper.toDto(userTitle.getTitle().getReward());
+            rewardDto.setRewardClaimed(userTitle.isRewardClaimed());
             titleDto.setReward(rewardDto);
             TaskDto taskDto = taskMapper.toDto(userTitle.getTitle().getTask());
             titleDto.setTask(taskDto);

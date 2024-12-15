@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SkillDto extends BaseDto {
+public class SkillDto {
     private double reading;
     private double writing;
     private double speaking;

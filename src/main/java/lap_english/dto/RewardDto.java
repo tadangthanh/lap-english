@@ -13,4 +13,5 @@ import lombok.Setter;
 public class RewardDto {
     private RewardType rewardType;
     private int quantity;
+    private boolean isRewardClaimed;
 }
