@@ -76,26 +76,31 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         user.setUsername(loginGoogleRequest.getEmail());
         user.setName(loginGoogleRequest.getName());
         user.setJson(loginGoogleRequest.getJson());
+        user.setAvatar(loginGoogleRequest.getAvatar());
         Role role = roleRepo.findRoleByName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         user.setRole(role);
         user = userRepo.saveAndFlush(user);
 
         //init cumulative for new user
         CumulativePoint cumulativePoint = initCumulativePointByUser(user);
+        userRepo.saveAndFlush(user);
 
         // init accumulate for new user
         Accumulate accumulate = initAccumulateByUser(user);
         user.setAccumulate(accumulate);
+        userRepo.saveAndFlush(user);
 
         // init skill for new user
         Skill skill = initSkillByUser(user);
         user.setSkill(skill);
+        userRepo.saveAndFlush(user);
 
         // init userDailyTask
         List<UserDailyTask> userDailyTasks = initDailyTaskByUser(user);
+        userRepo.saveAndFlush(user);
         // init title
         List<UserTitle> userTitles = initUserTitleByUser(user);
-        user.setAvatar(loginGoogleRequest.getAvatar());
+        userRepo.saveAndFlush(user);
         return user;
     }
 
@@ -148,7 +153,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         cumulativePoint.setDiamond(0);
         cumulativePoint.setRankPoints(0);
         cumulativePoint.setUser(user);
-        cumulativePointRepo.save(cumulativePoint);
+        cumulativePointRepo.saveAndFlush(cumulativePoint);
         return cumulativePoint;
     }
 
