@@ -1,6 +1,8 @@
 package lap_english.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,4 +21,7 @@ public class CumulativePoint extends BaseEntity {
     private int gold;
     //Điểm đua top
     private int rankPoints;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

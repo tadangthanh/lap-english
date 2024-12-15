@@ -111,7 +111,7 @@ public class SubTopicController {
             @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))), @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"), @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PutMapping("/unlock/{id}")
-    public ResponseData<SubTopicDto> unlockSubTopic(@PathVariable Long id) {
+    public ResponseData<Boolean> unlockSubTopic(@PathVariable Long id) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully", subTopicService.unlock(id));
     }
 

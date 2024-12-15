@@ -48,6 +48,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private final UserLearnedSubTopicRepo userLearnedSubTopicRepo;
     private final UserRepo userRepo;
     private final UserSubTopicRepo userSubTopicRepo;
+    private final CumulativePointRepo cumulativePointRepo;
 
 
     @Override
@@ -81,7 +82,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
             log.error("Sub Topic is used");
             throw new ResourceInUseException("Sub Topic is used, cannot delete");
         }
-        if(userLearnedSubTopicRepo.existsBySubTopicId(id)){
+        if (userLearnedSubTopicRepo.existsBySubTopicId(id)) {
             log.error("Sub Topic is learned");
             throw new ResourceInUseException("Sub Topic is learned by user, cannot delete");
         }
@@ -119,7 +120,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
         subTopicMapper.updateEntityFromDto(subTopicDto, subTopicExist);
         subTopicExist = subTopicRepo.save(subTopicExist);
-        if(subTopicDto.getMainTopicId() !=null && !subTopicExist.getMainTopic().getId().equals(subTopicDto.getMainTopicId())){
+        if (subTopicDto.getMainTopicId() != null && !subTopicExist.getMainTopic().getId().equals(subTopicDto.getMainTopicId())) {
             MainTopic mainTopic = getMainTopicById(subTopicDto.getMainTopicId());
             subTopicExist.setMainTopic(mainTopic);
         }
@@ -228,19 +229,33 @@ public class SubTopicServiceImpl implements ISubTopicService {
     }
 
     @Override
-    public SubTopicDto unlock(Long id) {
+    public boolean unlock(Long id) {
         User user = getCurrentUser();
+
         SubTopic subTopic = findSubtopicById(id);
-        if (userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId())) {
-            return convertSubtopicToDto(subTopic);
+        boolean isUnlock = userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId());
+        if (isUnlock) {
+            return true;
         }
+        CumulativePoint cumulativePoint = findCumulativePointByUserIdOrThrow(user.getId());
+        if(cumulativePoint.getGold()>=subTopic.getGold() && cumulativePoint.getDiamond()>=subTopic.getDiamond()){
+            cumulativePoint.setGold(cumulativePoint.getGold()-subTopic.getGold());
+            cumulativePoint.setDiamond(cumulativePoint.getDiamond()-subTopic.getDiamond());
+        }
+        cumulativePointRepo.save(cumulativePoint);
         UserSubTopic userSubTopic = new UserSubTopic();
         userSubTopic.setSubTopic(subTopic);
         userSubTopic.setUser(user);
         userSubTopicRepo.saveAndFlush(userSubTopic);
-        return convertSubtopicToDto(subTopic);
+        return true;
     }
 
+    private CumulativePoint findCumulativePointByUserIdOrThrow(Long id) {
+        return cumulativePointRepo.findByUserId(id).orElseThrow(() -> {
+            log.warn("cumulative point not found for user {}", id);
+            return new ResourceNotFoundException("cumulative point not found for user " + id);
+        });
+    }
 
     private PageResponse<List<SubTopicDto>> convertToPageResponse(Page<SubTopic> subTopicPage, Pageable pageable) {
         List<SubTopicDto> response = subTopicPage.stream().map(this::convertSubtopicToDto).collect(toList());

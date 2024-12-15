@@ -29,5 +29,5 @@ public interface ISubTopicService {
 
     SubTopicDto complete(Long id);
 
-    SubTopicDto unlock(Long id);
+    boolean unlock(Long id);
 }

@@ -3,9 +3,11 @@ package lap_english.service.impl;
 import lap_english.dto.request.AuthRequest;
 import lap_english.dto.request.LoginGoogleRequest;
 import lap_english.dto.response.TokenResponse;
+import lap_english.entity.CumulativePoint;
 import lap_english.entity.Role;
 import lap_english.entity.User;
 import lap_english.exception.ResourceNotFoundException;
+import lap_english.repository.CumulativePointRepo;
 import lap_english.repository.RoleRepo;
 import lap_english.repository.UserRepo;
 import lap_english.service.IAuthenticationService;
@@ -23,6 +25,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final UserRepo userRepo;
     private final AuthenticationManager authenticationManager;
     private final RoleRepo roleRepo;
+    private  final CumulativePointRepo cumulativePointRepo;
 
     @Override
     public TokenResponse login(AuthRequest authRequest) {
@@ -68,6 +71,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         Role role = roleRepo.findRoleByName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         user.setRole(role);
         user = userRepo.saveAndFlush(user);
+
+        CumulativePoint cumulativePoint = new CumulativePoint();
+        cumulativePoint.setUser(user);
+        cumulativePointRepo.save(cumulativePoint);
         return userRepo.saveAndFlush(user);
     }
 
