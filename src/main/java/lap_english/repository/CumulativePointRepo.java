@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface CumulativePointRepo extends JpaRepository<CumulativePoint, Long> {
-    CumulativePoint findByUserId(Long userId);
+    Optional<CumulativePoint> findByUserId(Long userId);
 }

@@ -75,7 +75,7 @@ public class UserServiceImpl implements IUserService {
             userResponseDto.setAccumulate(accumulateDto);
         }
         // set cumulate point
-        CumulativePoint cumulativePoint = cumulativePointRepo.findByUserId(currentUser.getId());
+        CumulativePoint cumulativePoint = cumulativePointRepo.findByUserId(currentUser.getId()).orElse(null);
         if (cumulativePoint != null) {
             CumulativePointDto pointDto = cumulativePointMapper.toDto(cumulativePoint);
             userResponseDto.setCumulativePoint(pointDto);
