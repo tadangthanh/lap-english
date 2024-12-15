@@ -82,7 +82,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         //init cumulative for new user
         CumulativePoint cumulativePoint = initCumulativePointByUser(user);
-        user.setCumulativePoint(cumulativePoint);
 
         // init accumulate for new user
         Accumulate accumulate = initAccumulateByUser(user);
@@ -145,7 +144,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private CumulativePoint initCumulativePointByUser(User user) {
         CumulativePoint cumulativePoint = new CumulativePoint();
-        cumulativePoint.setUser(user);
         cumulativePointRepo.save(cumulativePoint);
         return cumulativePoint;
     }
