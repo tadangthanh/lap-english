@@ -2,7 +2,7 @@ package lap_english.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,12 +14,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "title") // danh hieu
-public class Title extends BaseEntity {
-    private String image;
-    private String title;
-    @OneToOne
-    @JoinColumn(name = "task_id")
-    private Task task;
+@Table(name = "user_daily_task")
+public class UserDailyTask extends BaseEntity{
+    @ManyToOne
+    @JoinColumn(name = "daily_task_id")
+    private DailyTask dailyTask;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

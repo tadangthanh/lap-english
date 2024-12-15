@@ -241,13 +241,15 @@ public class SubTopicServiceImpl implements ISubTopicService {
         if(cumulativePoint.getGold()>=subTopic.getGold() && cumulativePoint.getDiamond()>=subTopic.getDiamond()){
             cumulativePoint.setGold(cumulativePoint.getGold()-subTopic.getGold());
             cumulativePoint.setDiamond(cumulativePoint.getDiamond()-subTopic.getDiamond());
+            cumulativePointRepo.save(cumulativePoint);
+            UserSubTopic userSubTopic = new UserSubTopic();
+            userSubTopic.setSubTopic(subTopic);
+            userSubTopic.setUser(user);
+            userSubTopicRepo.saveAndFlush(userSubTopic);
+            return true;
         }
-        cumulativePointRepo.save(cumulativePoint);
-        UserSubTopic userSubTopic = new UserSubTopic();
-        userSubTopic.setSubTopic(subTopic);
-        userSubTopic.setUser(user);
-        userSubTopicRepo.saveAndFlush(userSubTopic);
-        return true;
+
+        return false;
     }
 
     private CumulativePoint findCumulativePointByUserIdOrThrow(Long id) {
