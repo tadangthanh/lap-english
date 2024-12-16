@@ -240,7 +240,6 @@ public class SubTopicServiceImpl implements ISubTopicService {
     @Override
     public boolean unlock(Long id) {
         User user = getCurrentUser();
-
         SubTopic subTopic = findSubtopicByIdOrThrow(id);
         boolean isUnlock = userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId());
         if (isUnlock) {
@@ -265,6 +264,14 @@ public class SubTopicServiceImpl implements ISubTopicService {
     public void updateQuiz(QuizResult quizResult) {
         User currentUser = getCurrentUser();
         boolean isLearned = userLearnedSubTopicRepo.existsByUserIdAndSubtopicId(currentUser.getId(), quizResult.getIdObject());
+        if(!isLearned){
+            SubTopic subTopicExist = findSubtopicByIdOrThrow(quizResult.getIdObject());
+            UserLearnedSubTopic userLearnedSubTopic = new UserLearnedSubTopic();
+            userLearnedSubTopic.setSubTopic(subTopicExist);
+            userLearnedSubTopic.setUser(currentUser);
+            userLearnedSubTopic.setCompletedDate(new Date());
+            userLearnedSubTopicRepo.saveAndFlush(userLearnedSubTopic);
+        }
         quizResult.setLearned(isLearned);
         //--- Cập nhật nhiệm vụ quiz  ---
         List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(currentUser.getId());
