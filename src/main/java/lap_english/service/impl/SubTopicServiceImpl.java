@@ -317,8 +317,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private void funUpDateTaskQuiz(UserDailyTask userDailyTask, QuizResult quizResult) {
         Task task = userDailyTask.getDailyTask().getTask();
         try {
-            FunTaskQuiz funTaskQuiz = FunTaskQuiz.valueOf(task.getKeyFunUpdate());
-            switch (funTaskQuiz) {
+            switch (task.getKeyFunUpdate()) {
                 case funLearnNewTopicWord:
                     if (!quizResult.isLearned()) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));

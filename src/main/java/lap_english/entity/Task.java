@@ -16,9 +16,10 @@ public class Task extends BaseEntity{
     private String description;
     @Enumerated(EnumType.STRING)
     private TypeTask type;
-    private String keyFunUpdate;
-    private double total;
-    @OneToOne
+    @Enumerated(EnumType.STRING)
+    private FunTaskQuiz keyFunUpdate;
+    private double total; // tổng số nhiệm vụ cần hoàn thành
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "reward_id")
     private Reward reward;
 }

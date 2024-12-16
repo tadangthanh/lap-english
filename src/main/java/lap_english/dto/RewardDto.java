@@ -11,9 +11,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RewardDto {
-    private RewardType rewardType;
-    private int quantity;
+public class RewardDto extends BaseDto{
+    private int gold;
+    private int diamond;
     @JsonProperty("isRewardClaimed")
     private boolean isRewardClaimed;
 }

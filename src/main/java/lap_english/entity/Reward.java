@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "reward")// qua
-public class Reward extends BaseEntity{
-    private RewardType rewardType;
-    private int quantity;
+public class Reward extends BaseEntity {
+    private int gold;
+    private int diamond;
 }
