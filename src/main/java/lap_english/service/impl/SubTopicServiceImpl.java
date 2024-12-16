@@ -264,7 +264,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     @Override
     public void updateQuiz(QuizResult quizResult) {
         User currentUser = getCurrentUser();
-        boolean isLearned = userLearnedSubTopicRepo.existByUserIdAndSubtopicId(currentUser.getId(), quizResult.getIdObject());
+        boolean isLearned = userLearnedSubTopicRepo.existsByUserIdAndSubtopicId(currentUser.getId(), quizResult.getIdObject());
         quizResult.setLearned(isLearned);
         //--- Cập nhật nhiệm vụ quiz  ---
         List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(currentUser.getId());

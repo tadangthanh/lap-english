@@ -12,6 +12,7 @@ public interface UserLearnedSubTopicRepo extends JpaRepository<UserLearnedSubTop
 
     Optional<UserLearnedSubTopic> findByUserIdAndSubTopicId(Long userId, Long subTopicId);
     boolean existsBySubTopicId(Long subTopicId);
-    @Query("select count(u) from UserLearnedSubTopic u where u.user.id = ?1 and u.subTopic.id = ?2")
-    boolean existByUserIdAndSubtopicId(Long userId, Long subTopicId);
+    @Query("select case when count(u) > 0 then true else false end from UserLearnedSubTopic u where u.user.id = ?1 and u.subTopic.id = ?2")
+    boolean existsByUserIdAndSubtopicId(Long userId, Long subTopicId);
+
 }
