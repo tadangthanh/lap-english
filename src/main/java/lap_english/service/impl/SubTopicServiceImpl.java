@@ -2,7 +2,10 @@ package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
 import lap_english.dto.LockStatusManager;
+import lap_english.dto.SkillDto;
 import lap_english.dto.SubTopicDto;
+import lap_english.dto.request.QuizResult;
+import lap_english.dto.request.TypeQuizResult;
 import lap_english.dto.response.PageResponse;
 import lap_english.entity.*;
 import lap_english.exception.DuplicateResource;
@@ -49,6 +52,13 @@ public class SubTopicServiceImpl implements ISubTopicService {
     private final UserRepo userRepo;
     private final UserSubTopicRepo userSubTopicRepo;
     private final CumulativePointRepo cumulativePointRepo;
+    private final AccumulateRepo accumulateRepo;
+    private final SkillRepo skillRepo;
+    private final UserDailyTaskRepo userDailyTaskRepo;
+    private final TaskRepo taskRepo;
+    private final TitleRepo titleRepo;
+    private final DailyTaskRepo dailyTaskRepo;
+    private final UserTitleRepo userTitleRepo;
 
 
     @Override
@@ -238,9 +248,9 @@ public class SubTopicServiceImpl implements ISubTopicService {
             return true;
         }
         CumulativePoint cumulativePoint = findCumulativePointByUserIdOrThrow(user.getId());
-        if(cumulativePoint.getGold()>=subTopic.getGold() && cumulativePoint.getDiamond()>=subTopic.getDiamond()){
-            cumulativePoint.setGold(cumulativePoint.getGold()-subTopic.getGold());
-            cumulativePoint.setDiamond(cumulativePoint.getDiamond()-subTopic.getDiamond());
+        if (cumulativePoint.getGold() >= subTopic.getGold() && cumulativePoint.getDiamond() >= subTopic.getDiamond()) {
+            cumulativePoint.setGold(cumulativePoint.getGold() - subTopic.getGold());
+            cumulativePoint.setDiamond(cumulativePoint.getDiamond() - subTopic.getDiamond());
             cumulativePointRepo.save(cumulativePoint);
             UserSubTopic userSubTopic = new UserSubTopic();
             userSubTopic.setSubTopic(subTopic);
@@ -250,6 +260,93 @@ public class SubTopicServiceImpl implements ISubTopicService {
         }
 
         return false;
+    }
+
+    @Override
+    public void updateQuiz(QuizResult quizResult) {
+        User currentUser = getCurrentUser();
+        //--- Cập nhật nhiệm vụ quiz  ---
+        List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(currentUser.getId());
+        userDailyTasks.forEach(userDailyTask -> {
+            funUpDateTaskQuiz(userDailyTask, quizResult);
+        });
+        //--- Cập nhật kĩ năng  ---
+        Skill skill = currentUser.getSkill();
+        updateSkillByUser(skill, quizResult);
+        skillRepo.saveAndFlush(skill);
+
+        //--- Cập nhật điểm (vàng)  ---
+        CumulativePoint cumulativePoint = findCumulativePointByUserIdOrThrow(currentUser.getId());
+        cumulativePoint.setGold(cumulativePoint.getGold() + quizResult.getBonus());
+        cumulativePoint.setRankPoints(cumulativePoint.getRankPoints() + quizResult.getPointRank());
+        cumulativePointRepo.saveAndFlush(cumulativePoint);
+
+        //--- Cập nhật điểm tích lũy  ---
+        Accumulate accumulate = currentUser.getAccumulate();
+        if(!quizResult.isLearned()){
+            accumulate.setWords(accumulate.getWords() + quizResult.getTotalWord());
+            accumulate.setSentences(accumulate.getSentences() + quizResult.getTotalSentence());
+        }
+        accumulateRepo.saveAndFlush(accumulate);
+    }
+
+    private void updateSkillByUser(Skill skill, QuizResult quizResult) {
+        double totalSkill = skill.getListening() + skill.getReading() + skill.getWriting() + skill.getSpeaking();
+        if (quizResult.getTotalRead() > 0) {
+            skill.setReading(skill.getReading() + (double) quizResult.getCorrectRead() / quizResult.getTotalRead() * (1 - skill.getReading() / totalSkill));
+        }
+        if (quizResult.getTotalListen() > 0) {
+            skill.setListening(skill.getListening() + (double) quizResult.getCorrectListen() / quizResult.getTotalListen() * (1 - skill.getListening() / totalSkill));
+        }
+        if (quizResult.getTotalSpeak() > 0) {
+            skill.setSpeaking(skill.getSpeaking() + (double) quizResult.getCorrectSpeak() / quizResult.getTotalSpeak() * (1 - skill.getSpeaking() / totalSkill));
+        }
+        if (quizResult.getTotalWrite() > 0) {
+            skill.setWriting(skill.getWriting() + (double) quizResult.getCorrectWrite() / quizResult.getTotalWrite() * (1 - skill.getWriting() / totalSkill));
+        }
+    }
+
+    private void funUpDateTaskQuiz(UserDailyTask userDailyTask, QuizResult quizResult) {
+        Task task = userDailyTask.getDailyTask().getTask();
+        try {
+            FunTaskQuiz funTaskQuiz = FunTaskQuiz.valueOf(task.getKeyFunUpdate());
+            switch (funTaskQuiz) {
+                case funLearnNewTopicWord:
+                    if (!quizResult.isLearned()) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                case funLearnReviewTopicWord:
+                    if (quizResult.isLearned()) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                case funLearnNewTopicWord80:
+                    if (!quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.8) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                case funLearnReviewTopicWord90:
+                    if (quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.9) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                case funLearnWithSkillWrite100:
+                    if (quizResult.getCorrectWrite() == quizResult.getTotalWrite()) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                case funLearnReviewVocabulary:
+                    if (quizResult.isLearned() && quizResult.getType() == TypeQuizResult.quizzVocabulary) {
+                        userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
+                    }
+                    break;
+                default:
+                    log.warn("Unrecognized quiz result: {}", quizResult);
+            }
+        } catch (Exception e) {
+            log.error("Error updating quiz result", e);
+        }
     }
 
     private CumulativePoint findCumulativePointByUserIdOrThrow(Long id) {

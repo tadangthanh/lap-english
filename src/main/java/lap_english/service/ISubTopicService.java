@@ -1,6 +1,7 @@
 package lap_english.service;
 
 import lap_english.dto.SubTopicDto;
+import lap_english.dto.request.QuizResult;
 import lap_english.dto.response.PageResponse;
 import lap_english.entity.SubTopic;
 import org.springframework.data.domain.Pageable;
@@ -30,4 +31,6 @@ public interface ISubTopicService {
     SubTopicDto complete(Long id);
 
     boolean unlock(Long id);
+
+    void updateQuiz(QuizResult quizResult);
 }

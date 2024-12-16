@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Min;
 import lap_english.dto.SubTopicDto;
+import lap_english.dto.request.QuizResult;
 import lap_english.dto.response.PageResponse;
 import lap_english.dto.response.ResponseData;
 import lap_english.exception.ErrorObjectDetails;
@@ -113,6 +114,16 @@ public class SubTopicController {
     @PutMapping("/unlock/{id}")
     public ResponseData<Boolean> unlockSubTopic(@PathVariable Long id) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully", subTopicService.unlock(id));
+    }
+
+    @Operation(summary = "updateUserQuiz", description = "Trả về subtopic đã mở khóa")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Thành công, Trả về subtopic đã mở khóa"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorObjectDetails.class))), @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"), @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @PutMapping("/user-quiz")
+    public ResponseData<Void> updateUserQuiz(@RequestBody QuizResult quizResult) {
+        subTopicService.updateQuiz(quizResult);
+        return new ResponseData<>(HttpStatus.OK.value(), "Get sub topic successfully",null);
     }
 
 }
