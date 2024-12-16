@@ -229,11 +229,11 @@ public class SubTopicServiceImpl implements ISubTopicService {
             userLearnedSubTopic.setSubTopic(subTopicExist);
             userLearnedSubTopic.setUser(currentUser);
             userLearnedSubTopic.setCompletedDate(new Date());
-            userLearnedSubTopicRepo.save(userLearnedSubTopic);
+            userLearnedSubTopicRepo.saveAndFlush(userLearnedSubTopic);
             return convertSubtopicToDto(subTopicExist);
         }
         userLearnedSubTopic.setCompletedDate(new Date());
-        userLearnedSubTopicRepo.save(userLearnedSubTopic);
+        userLearnedSubTopicRepo.saveAndFlush(userLearnedSubTopic);
         return convertSubtopicToDto(subTopicExist);
     }
 
