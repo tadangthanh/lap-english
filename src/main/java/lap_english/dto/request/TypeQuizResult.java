@@ -3,13 +3,13 @@ package lap_english.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum TypeQuizResult {
-    @JsonProperty("quizzVocabulary")
+    @JsonProperty("TypeQuizz.quizzVocabulary")
     quizzVocabulary, // tu vung
-    @JsonProperty("quizzSentence")
+    @JsonProperty("TypeQuizz.quizzSentence")
     quizzSentence, // cau
-    @JsonProperty("quizGrammar")
+    @JsonProperty("TypeQuizz.quizGrammar")
     quizGrammar, //grammar
-    @JsonProperty("quizzCustom")
+    @JsonProperty("TypeQuizz.quizzCustom")
     quizzCustom //
 
 }
