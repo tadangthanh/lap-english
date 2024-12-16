@@ -264,6 +264,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     @Override
     public void updateQuiz(QuizResult quizResult) {
         User currentUser = getCurrentUser();
+        quizResult.setLearned(userLearnedSubTopicRepo.existByUserIdAndSubtopicId(currentUser.getId(), quizResult.getIdObject()));
         //--- Cập nhật nhiệm vụ quiz  ---
         List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(currentUser.getId());
         userDailyTasks.forEach(userDailyTask -> {
@@ -307,27 +308,26 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     private void funUpDateTaskQuiz(UserDailyTask userDailyTask, QuizResult quizResult) {
         Task task = userDailyTask.getDailyTask().getTask();
-       boolean isLearned = userLearnedSubTopicRepo.existByUserIdAndSubtopicId(userDailyTask.getUser().getId(), quizResult.getIdObject());
         try {
             FunTaskQuiz funTaskQuiz = FunTaskQuiz.valueOf(task.getKeyFunUpdate());
             switch (funTaskQuiz) {
                 case funLearnNewTopicWord:
-                    if (!isLearned) {
+                    if (!quizResult.isLearned()) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnReviewTopicWord:
-                    if (isLearned) {
+                    if (quizResult.isLearned()) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnNewTopicWord80:
-                    if (!isLearned && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.8) {
+                    if (!quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.8) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnReviewTopicWord90:
-                    if (isLearned && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.9) {
+                    if (quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.9) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
@@ -337,7 +337,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
                     }
                     break;
                 case funLearnReviewVocabulary:
-                    if (isLearned && quizResult.getType() == TypeQuizResult.quizzVocabulary) {
+                    if (quizResult.isLearned() && quizResult.getType() == TypeQuizResult.quizzVocabulary) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
