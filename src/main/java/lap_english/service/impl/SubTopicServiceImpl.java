@@ -2,7 +2,6 @@ package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
 import lap_english.dto.LockStatusManager;
-import lap_english.dto.SkillDto;
 import lap_english.dto.SubTopicDto;
 import lap_english.dto.request.QuizResult;
 import lap_english.dto.request.TypeQuizResult;
@@ -222,7 +221,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     @Override
     public SubTopicDto complete(Long id) {
-        SubTopic subTopicExist = findSubtopicById(id);
+        SubTopic subTopicExist = findSubtopicByIdOrThrow(id);
         User currentUser = getCurrentUser();
         UserLearnedSubTopic userLearnedSubTopic = userLearnedSubTopicRepo.findByUserIdAndSubTopicId(currentUser.getId(), subTopicExist.getId()).orElse(null);
         if (userLearnedSubTopic == null) {
@@ -242,7 +241,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
     public boolean unlock(Long id) {
         User user = getCurrentUser();
 
-        SubTopic subTopic = findSubtopicById(id);
+        SubTopic subTopic = findSubtopicByIdOrThrow(id);
         boolean isUnlock = userSubTopicRepo.existsByUserIdAndSubTopicId(user.getId(), subTopic.getId());
         if (isUnlock) {
             return true;
@@ -308,26 +307,27 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
     private void funUpDateTaskQuiz(UserDailyTask userDailyTask, QuizResult quizResult) {
         Task task = userDailyTask.getDailyTask().getTask();
+       boolean isLearned = userLearnedSubTopicRepo.existByUserIdAndSubtopicId(userDailyTask.getUser().getId(), quizResult.getIdObject());
         try {
             FunTaskQuiz funTaskQuiz = FunTaskQuiz.valueOf(task.getKeyFunUpdate());
             switch (funTaskQuiz) {
                 case funLearnNewTopicWord:
-                    if (!quizResult.isLearned()) {
+                    if (!isLearned) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnReviewTopicWord:
-                    if (quizResult.isLearned()) {
+                    if (isLearned) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnNewTopicWord80:
-                    if (!quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.8) {
+                    if (!isLearned && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.8) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
                 case funLearnReviewTopicWord90:
-                    if (quizResult.isLearned() && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.9) {
+                    if (isLearned && ((double) quizResult.getCorrect() / quizResult.getTotal()) > -0.9) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
@@ -337,7 +337,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
                     }
                     break;
                 case funLearnReviewVocabulary:
-                    if (quizResult.isLearned() && quizResult.getType() == TypeQuizResult.quizzVocabulary) {
+                    if (isLearned && quizResult.getType() == TypeQuizResult.quizzVocabulary) {
                         userDailyTask.setProgress(Math.min(Math.max(userDailyTask.getProgress() + 1, 0), task.getTotal()));
                     }
                     break;
@@ -394,7 +394,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
         return userRepo.findByEmail(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    private SubTopic findSubtopicById(Long id) {
+    private SubTopic findSubtopicByIdOrThrow(Long id) {
         return subTopicRepo.findById(id).orElseThrow(() -> {
             log.warn("Sub topic not found");
             return new ResourceNotFoundException("Sub Topic not found");

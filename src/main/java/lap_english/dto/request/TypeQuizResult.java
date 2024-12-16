@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum TypeQuizResult {
     @JsonProperty("quizzVocabulary")
-    quizzVocabulary,
+    quizzVocabulary, // tu vung
     @JsonProperty("quizzSentence")
-    quizzSentence,
+    quizzSentence, // cau
     @JsonProperty("quizGrammar")
-    quizGrammar,
+    quizGrammar, //grammar
     @JsonProperty("quizzCustom")
-    quizzCustom
+    quizzCustom //
 
 }

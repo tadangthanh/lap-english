@@ -11,4 +11,5 @@ public interface UserLearnedSubTopicRepo extends JpaRepository<UserLearnedSubTop
 
     Optional<UserLearnedSubTopic> findByUserIdAndSubTopicId(Long userId, Long subTopicId);
     boolean existsBySubTopicId(Long subTopicId);
+    boolean existByUserIdAndSubtopicId(Long userId, Long subTopicId);
 }
