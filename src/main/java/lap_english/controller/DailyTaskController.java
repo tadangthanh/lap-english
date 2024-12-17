@@ -23,16 +23,17 @@ public class DailyTaskController {
     private final IDailyTaskService dailyTaskService;
 
 
-    @Operation(summary = "nhận phần thưởng của nhiệm vụ đã hoàn thành ", description = "Trả về nhiệm vụ đã nhận ")
+    @Operation(summary = "nhận phần thưởng của nhiệm vụ hàng ngày  đã hoàn thành ", description = "không trả về dữ liệu")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Thành công, Trả về nhiệm vụ đã nhận"),
+            @ApiResponse(responseCode = "200", description = "Thành công, không trả về dữ liệu"),
             @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi do progress chưa đạt 100% hoặc đã nhận thưởng rồi ",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorObjectDetails.class))),
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping("/claim-reward/{dailyTaskId}")
-    public ResponseData<UserDailyTaskDto> create(@PathVariable Long dailyTaskId) {
-      return  new ResponseData<>(HttpStatus.OK.value(), "success", dailyTaskService.claimReward(dailyTaskId));
+    public ResponseData<Void> create(@PathVariable Long dailyTaskId) {
+        dailyTaskService.claimReward(dailyTaskId);
+      return  new ResponseData<>(HttpStatus.OK.value(), "success", null);
     }
 }

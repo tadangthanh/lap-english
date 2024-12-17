@@ -1,10 +1,6 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
-import lap_english.dto.DailyTaskDto;
-import lap_english.dto.RewardDto;
-import lap_english.dto.TaskDto;
-import lap_english.dto.UserDailyTaskDto;
 import lap_english.entity.*;
 import lap_english.exception.BadRequestException;
 import lap_english.exception.ResourceNotFoundException;
@@ -35,7 +31,7 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
     private final RewardMapper rewardMapper;
 
     @Override
-    public UserDailyTaskDto claimReward(Long dailyTaskId) {
+    public void claimReward(Long dailyTaskId) {
         User user = getCurrentUser();
         UserDailyTask userDailyTask = findUserDailyTaskByDailyTaskAndUserIdOrThrow(dailyTaskId, user.getId());
         // neu phan thuong nhan thuong roi thi thoi
@@ -53,20 +49,21 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         }
         // lay phan thuong
         // cap nhat lai phan thuong
-        userDailyTask.setRewardClaimed(true);
-        userDailyTaskRepo.save(userDailyTask);
+//        userDailyTask.setRewardClaimed(true);
+//        userDailyTaskRepo.save(userDailyTask);
         // cong tien thuong cho user
         Reward reward = dailyTask.getReward();
         addRewardToUser(user, reward);
-        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
-        userDailyTaskDto.setUserId(user.getId());
-        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
-        RewardDto rewardDto = rewardMapper.toDto(reward);
-        dailyTaskDto.setReward(rewardDto);
-        TaskDto taskDto = taskMapper.toDto(task);
-        dailyTaskDto.setTask(taskDto);
-        userDailyTaskDto.setDailyTask(dailyTaskDto);
-        return userDailyTaskDto;
+//        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
+//        userDailyTaskDto.setUserId(user.getId());
+//        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
+//        RewardDto rewardDto = rewardMapper.toDto(reward);
+//        dailyTaskDto.setReward(rewardDto);
+//        TaskDto taskDto = taskMapper.toDto(task);
+//        dailyTaskDto.setTask(taskDto);
+//        userDailyTaskDto.setDailyTask(dailyTaskDto);
+        // xoa userDailyTask
+        userDailyTaskRepo.delete(userDailyTask);
     }
 
     private void addRewardToUser(User user, Reward reward) {

@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserTitleDto extends BaseDto{
     private TitleDto title;
-    private UserDto user;
+    private Long userId;
     private double progress;
     private boolean isRewardClaimed;
 }

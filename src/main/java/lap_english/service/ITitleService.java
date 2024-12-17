@@ -1,5 +1,7 @@
 package lap_english.service;
 
-public interface ITitleService {
+import lap_english.dto.UserTitleDto;
 
+public interface ITitleService {
+    void claimTitle(Long titleId);
 }

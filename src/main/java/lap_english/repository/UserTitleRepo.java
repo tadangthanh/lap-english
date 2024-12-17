@@ -17,4 +17,6 @@ public interface UserTitleRepo extends JpaRepository<UserTitle,Long> {
     @Modifying
     @Query("delete from UserTitle ut where ut.title.id = ?1")
     void deleteAllByTitleId(Long titleId);
+    @Query("select ut from UserTitle ut where ut.title.id = ?1 and ut.user.id = ?2")
+    Optional<UserTitle>findByTitleIdAndUserId(Long titleId, Long userId);
 }
