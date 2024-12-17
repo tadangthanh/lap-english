@@ -44,12 +44,14 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
             throw new BadRequestException("Reward already claimed");
         }
         // neu progress chua 100% thi thoi
-        if (userDailyTask.getProgress() < 100) {
+        DailyTask dailyTask = userDailyTask.getDailyTask();
+        Task task = dailyTask.getTask();
+        double total = task.getTotal();
+        if (userDailyTask.getProgress() < total) {
             log.error("Progress is not 100% for dailyTaskId: {}", dailyTaskId);
             throw new BadRequestException("Progress is not 100%");
         }
         // lay phan thuong
-        DailyTask dailyTask = userDailyTask.getDailyTask();
         // cap nhat lai phan thuong
         userDailyTask.setRewardClaimed(true);
         userDailyTaskRepo.save(userDailyTask);
@@ -61,7 +63,7 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
         RewardDto rewardDto = rewardMapper.toDto(reward);
         dailyTaskDto.setReward(rewardDto);
-        TaskDto taskDto = taskMapper.toDto(dailyTask.getTask());
+        TaskDto taskDto = taskMapper.toDto(task);
         dailyTaskDto.setTask(taskDto);
         userDailyTaskDto.setDailyTask(dailyTaskDto);
         return userDailyTaskDto;
