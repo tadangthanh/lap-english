@@ -65,6 +65,7 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         userDailyTaskDto.setUserId(user.getId());
         DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
         RewardDto rewardDto = rewardMapper.toDto(reward);
+        rewardDto.setRewardClaimed(true);
         dailyTaskDto.setReward(rewardDto);
         TaskDto taskDto = taskMapper.toDto(task);
         dailyTaskDto.setTask(taskDto);
