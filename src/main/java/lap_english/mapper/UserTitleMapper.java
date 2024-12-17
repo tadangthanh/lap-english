@@ -8,7 +8,7 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = IGNORE)
 public interface UserTitleMapper {
-    UserTitleDto toDto(UserTitleDto userTitleDto);
+    UserTitleDto toDto(UserTitle userTitle);
 
-    UserTitle toEntity(UserTitle userTitle);
+    UserTitle toEntity(UserTitleDto userTitleDto);
 }

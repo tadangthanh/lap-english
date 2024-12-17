@@ -61,6 +61,7 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         // cong tien thuong cho user
         Reward reward = dailyTask.getReward();
         addRewardToUser(user, reward);
+        // tra ve thong tin userDailyTask da nhan thuong
         UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
         userDailyTaskDto.setUserId(user.getId());
         DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
