@@ -1,5 +1,6 @@
 package lap_english.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lap_english.entity.FunTaskQuiz;
@@ -22,6 +23,7 @@ public class TaskDto extends BaseDto {
     private Double total;
     private Double progress;
     @NotNull(message = "reward is required")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private RewardDto reward;
     @NotNull(message = "taskFor is required")
     private TaskFor taskFor;
