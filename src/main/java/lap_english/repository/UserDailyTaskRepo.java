@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,8 @@ public interface UserDailyTaskRepo extends JpaRepository<UserDailyTask, Long> {
     @Query("delete from UserDailyTask udt where udt.dailyTask.id = ?1")
     void deleteAllByDailyTaskId(Long dailyTaskId);
 
-@Query("select udt from UserDailyTask udt where udt.dailyTask.id = ?1 and udt.user.id = ?2")
-    Optional<UserDailyTask> findByDailyTaskAndUserId(Long dailyTaskId, Long userId);
+    @Query("select udt from UserDailyTask udt " +
+            "where udt.dailyTask.id = ?1 and udt.user.id = ?2 and FUNCTION('DATE', udt.createdAt) = FUNCTION('DATE', ?3)")
+    Optional<UserDailyTask> findByDailyTaskAndUserId(Long dailyTaskId, Long userId, Date createdAt);
 
 }

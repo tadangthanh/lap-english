@@ -1,6 +1,10 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
+import lap_english.dto.DailyTaskDto;
+import lap_english.dto.RewardDto;
+import lap_english.dto.TaskDto;
+import lap_english.dto.UserDailyTaskDto;
 import lap_english.entity.*;
 import lap_english.exception.BadRequestException;
 import lap_english.exception.ResourceNotFoundException;
@@ -14,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +37,10 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
     private final RewardMapper rewardMapper;
 
     @Override
-    public void claimReward(Long dailyTaskId) {
+    public UserDailyTaskDto claimReward(Long dailyTaskId) {
         User user = getCurrentUser();
-        UserDailyTask userDailyTask = findUserDailyTaskByDailyTaskAndUserIdOrThrow(dailyTaskId, user.getId());
+        // nhiệm vụ của ngày hiện tại
+        UserDailyTask userDailyTask = findUserDailyTaskByDailyTaskAndUserIdAndDateNowOrThrow(dailyTaskId, user.getId());
         // neu phan thuong nhan thuong roi thi thoi
         if (userDailyTask.isRewardClaimed()) {
             log.error("Reward already claimed for dailyTaskId: {}", dailyTaskId);
@@ -49,21 +56,20 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         }
         // lay phan thuong
         // cap nhat lai phan thuong
-//        userDailyTask.setRewardClaimed(true);
-//        userDailyTaskRepo.save(userDailyTask);
+        userDailyTask.setRewardClaimed(true);
+        userDailyTaskRepo.save(userDailyTask);
         // cong tien thuong cho user
         Reward reward = dailyTask.getReward();
         addRewardToUser(user, reward);
-//        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
-//        userDailyTaskDto.setUserId(user.getId());
-//        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
-//        RewardDto rewardDto = rewardMapper.toDto(reward);
-//        dailyTaskDto.setReward(rewardDto);
-//        TaskDto taskDto = taskMapper.toDto(task);
-//        dailyTaskDto.setTask(taskDto);
-//        userDailyTaskDto.setDailyTask(dailyTaskDto);
-        // xoa userDailyTask
-        userDailyTaskRepo.delete(userDailyTask);
+        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
+        userDailyTaskDto.setUserId(user.getId());
+        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
+        RewardDto rewardDto = rewardMapper.toDto(reward);
+        dailyTaskDto.setReward(rewardDto);
+        TaskDto taskDto = taskMapper.toDto(task);
+        dailyTaskDto.setTask(taskDto);
+        userDailyTaskDto.setDailyTask(dailyTaskDto);
+        return userDailyTaskDto;
     }
 
     private void addRewardToUser(User user, Reward reward) {
@@ -73,8 +79,10 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         cumulativePointRepo.save(cumulativePoint);
     }
 
-    private UserDailyTask findUserDailyTaskByDailyTaskAndUserIdOrThrow(Long dailyTaskId, Long userId) {
-        return userDailyTaskRepo.findByDailyTaskAndUserId(dailyTaskId,userId)
+    // lấy ra nhiệm vụ hàng ngày của user hiện tại dựa trên dailyTaskId và userId và ngày hiện tại
+    private UserDailyTask findUserDailyTaskByDailyTaskAndUserIdAndDateNowOrThrow(Long dailyTaskId, Long userId) {
+        Date now = new Date();
+        return userDailyTaskRepo.findByDailyTaskAndUserId(dailyTaskId, userId, now)
                 .orElseThrow(() -> {
                     log.error("UserDailyTask not found with dailyTaskId: {}", dailyTaskId);
                     return new RuntimeException("UserDailyTask not found");

@@ -1,5 +1,7 @@
 package lap_english.service;
 
+import lap_english.dto.UserDailyTaskDto;
+
 public interface IDailyTaskService {
-    void claimReward(Long dailyTaskId);
+    UserDailyTaskDto claimReward(Long dailyTaskId);
 }
