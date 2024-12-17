@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class TitleController {
-    private ITitleService titleService;
+    private final ITitleService titleService;
 
     @Operation(summary = "nhận phần thưởng của title đã đạt được ", description = "trả về thông tin title đã nhận thưởng",
             tags = {"title"})

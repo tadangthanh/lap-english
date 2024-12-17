@@ -67,6 +67,7 @@ public class TitleServiceImpl implements ITitleService {
         userTitleDto.setUserId(user.getId());
         TitleDto titleDto = titleMapper.toDto(title);
         RewardDto rewardDto = rewardMapper.toDto(reward);
+        rewardDto.setRewardClaimed(true);
         TaskDto taskDto =  taskMapper.toDto(task);
         titleDto.setTask(taskDto);
         titleDto.setReward(rewardDto);
