@@ -13,6 +13,7 @@ import lap_english.repository.UserTitleRepo;
 import lap_english.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,6 +61,7 @@ public class UserServiceImpl implements IUserService {
         User currentUser = getCurrentUser();
         return currentUser.getJson();
     }
+
 
     @Override
     public UserResponseDto getUserDto() {

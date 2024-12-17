@@ -18,4 +18,6 @@ public interface UserDailyTaskRepo extends JpaRepository<UserDailyTask, Long> {
     @Query("delete from UserDailyTask udt where udt.dailyTask.id = ?1")
     void deleteAllByDailyTaskId(Long dailyTaskId);
 
+
+
 }

@@ -16,7 +16,9 @@ public interface IMainTopicService {
     PageResponse<?> getPage(int page, int size);
 
     List<MainTopicDto> getAllMainTopicIsWord();
+
     List<MainTopicDto> getAllMainTopicIsSentence();
+
     List<MainTopicDto> getAll();
 
     PageResponse<List<MainTopicDto>> advanceSearchBySpecification(Pageable pageable, String[] mainTopic);
