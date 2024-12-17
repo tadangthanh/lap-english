@@ -30,9 +30,6 @@ public class User extends BaseEntity implements UserDetails {
     @OneToOne
     @JoinColumn(name = "accumulate_id")
     private Accumulate accumulate;
-//
-//    @OneToOne(cascade = CascadeType.ALL)
-//    private CumulativePoint cumulativePoint;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserDailyTaskRepo extends JpaRepository<UserDailyTask, Long> {
@@ -18,6 +19,7 @@ public interface UserDailyTaskRepo extends JpaRepository<UserDailyTask, Long> {
     @Query("delete from UserDailyTask udt where udt.dailyTask.id = ?1")
     void deleteAllByDailyTaskId(Long dailyTaskId);
 
-
+@Query("select udt from UserDailyTask udt where udt.dailyTask.id = ?1 and udt.user.id = ?2")
+    Optional<UserDailyTask> findByDailyTaskAndUserId(Long dailyTaskId, Long userId);
 
 }
