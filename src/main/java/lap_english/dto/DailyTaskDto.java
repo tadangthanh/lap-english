@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DailyTaskDto {
+public class DailyTaskDto extends BaseDto{
     private TaskDto task;
     private RewardDto reward;
 }
