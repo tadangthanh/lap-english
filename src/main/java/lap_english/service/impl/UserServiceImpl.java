@@ -38,6 +38,7 @@ public class UserServiceImpl implements IUserService {
     private final SkillMapper skillMapper;
     private final TaskMapper taskMapper;
     private final CumulativePointRepo cumulativePointRepo;
+    private final DailyTaskMapper dailyTaskMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -86,7 +87,7 @@ public class UserServiceImpl implements IUserService {
         List<DailyTaskDto> dailyTaskDtoList = new ArrayList<>();
         // set dailytask dto
         userDailyTasks.forEach(userDailyTask -> {
-            DailyTaskDto dailyTaskDto = new DailyTaskDto();
+            DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(userDailyTask.getDailyTask());
             DailyTask dailyTask = userDailyTask.getDailyTask();
             if (dailyTask != null) {
                 // set task va reward cho daily task dto
