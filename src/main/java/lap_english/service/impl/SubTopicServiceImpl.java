@@ -264,13 +264,15 @@ public class SubTopicServiceImpl implements ISubTopicService {
     public void updateQuiz(QuizResult quizResult) {
         User currentUser = getCurrentUser();
         boolean isLearned = userLearnedSubTopicRepo.existsByUserIdAndSubtopicId(currentUser.getId(), quizResult.getIdObject());
-        if(!isLearned){
-            SubTopic subTopicExist = findSubtopicByIdOrThrow(quizResult.getIdObject());
-            UserLearnedSubTopic userLearnedSubTopic = new UserLearnedSubTopic();
-            userLearnedSubTopic.setSubTopic(subTopicExist);
-            userLearnedSubTopic.setUser(currentUser);
-            userLearnedSubTopic.setCompletedDate(new Date());
-            userLearnedSubTopicRepo.saveAndFlush(userLearnedSubTopic);
+        if (!isLearned) {
+            if(quizResult.getType().equals(TypeQuizResult.quizzSentence) || quizResult.getType().equals(TypeQuizResult.quizzVocabulary)){
+                SubTopic subTopicExist = findSubtopicByIdOrThrow(quizResult.getIdObject());
+                UserLearnedSubTopic userLearnedSubTopic = new UserLearnedSubTopic();
+                userLearnedSubTopic.setSubTopic(subTopicExist);
+                userLearnedSubTopic.setUser(currentUser);
+                userLearnedSubTopic.setCompletedDate(new Date());
+                userLearnedSubTopicRepo.saveAndFlush(userLearnedSubTopic);
+            }
         }
         quizResult.setLearned(isLearned);
         //--- Cập nhật nhiệm vụ quiz  ---
@@ -291,7 +293,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
         //--- Cập nhật điểm tích lũy  ---
         Accumulate accumulate = currentUser.getAccumulate();
-        if(!quizResult.isLearned()){
+        if (!quizResult.isLearned()) {
             accumulate.setWords(accumulate.getWords() + quizResult.getTotalWord());
             accumulate.setSentences(accumulate.getSentences() + quizResult.getTotalSentence());
         }

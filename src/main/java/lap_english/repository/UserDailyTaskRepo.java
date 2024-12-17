@@ -12,9 +12,10 @@ import java.util.List;
 @Repository
 public interface UserDailyTaskRepo extends JpaRepository<UserDailyTask, Long> {
     List<UserDailyTask> findAllByUserId(Long userId);
-@Modifying
-@Transactional
-@Query("delete from UserDailyTask udt where udt.dailyTask.id = ?1")
+
+    @Modifying
+    @Transactional
+    @Query("delete from UserDailyTask udt where udt.dailyTask.id = ?1")
     void deleteAllByDailyTaskId(Long dailyTaskId);
 
 }
