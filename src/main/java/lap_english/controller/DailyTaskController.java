@@ -23,10 +23,10 @@ public class DailyTaskController {
     private final IDailyTaskService dailyTaskService;
 
 
-    @Operation(summary = "Mở khóa subtopic ", description = "Trả về subtopic đã mở khóa")
+    @Operation(summary = "nhận phần thưởng của nhiệm vụ đã hoàn thành ", description = "Trả về nhiệm vụ đã nhận ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Thành công, Trả về subtopic đã mở khóa"),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+            @ApiResponse(responseCode = "200", description = "Thành công, Trả về nhiệm vụ đã nhận"),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi do progress chưa đạt 100% hoặc đã nhận thưởng rồi ",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorObjectDetails.class))),
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
