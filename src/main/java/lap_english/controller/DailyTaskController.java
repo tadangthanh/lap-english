@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DailyTaskController {
     private final IDailyTaskService dailyTaskService;
-//    private final ITaskService taskService;
 
 
     @Operation(summary = "nhận phần thưởng của nhiệm vụ đã hoàn thành ", description = "Trả về nhiệm vụ đã nhận ")
