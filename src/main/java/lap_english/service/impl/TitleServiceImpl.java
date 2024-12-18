@@ -49,7 +49,7 @@ public class TitleServiceImpl implements ITitleService {
     private final IAzureService azureService;
 
     @Override
-    public UserTitleDto claimTitle(Long titleId) {
+    public void claimTitle(Long titleId) {
         User user = getCurrentUser();
         UserTitle userTitle = findUserTitleByTitleIdAndUserIdAndDateNowOrThrow(titleId, user.getId());
         // neu phan thuong nhan thuong roi thi thoi
@@ -73,17 +73,17 @@ public class TitleServiceImpl implements ITitleService {
         Reward reward = title.getReward();
         addRewardToUser(user, reward);
         // tra ve usertitleDto
-        UserTitleDto userTitleDto = userTitleMapper.toDto(userTitle);
-        userTitleDto.setUserId(user.getId());
-        TitleDto titleDto = titleMapper.toDto(title);
-        RewardDto rewardDto = rewardMapper.toDto(reward);
-        rewardDto.setRewardClaimed(true);
-        TaskDto taskDto = taskMapper.toDto(task);
-        titleDto.setTask(taskDto);
-        titleDto.setReward(rewardDto);
-        userTitleDto.setTitle(titleDto);
-        userTitleDto.setRewardClaimed(true);
-        return userTitleDto;
+//        UserTitleDto userTitleDto = userTitleMapper.toDto(userTitle);
+//        userTitleDto.setUserId(user.getId());
+//        TitleDto titleDto = titleMapper.toDto(title);
+//        RewardDto rewardDto = rewardMapper.toDto(reward);
+//        rewardDto.setRewardClaimed(true);
+//        TaskDto taskDto = taskMapper.toDto(task);
+//        titleDto.setTask(taskDto);
+//        titleDto.setReward(rewardDto);
+//        userTitleDto.setTitle(titleDto);
+//        userTitleDto.setRewardClaimed(true);
+//        return userTitleDto;
     }
 
     @Override

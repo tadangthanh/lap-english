@@ -36,8 +36,9 @@ public class TitleController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping("/claim-title/{titleId}")
-    public ResponseData<UserTitleDto> claimTitle(@PathVariable Long titleId) {
-        return new ResponseData<>(200, "success", titleService.claimTitle(titleId));
+    public ResponseData<Void> claimTitle(@PathVariable Long titleId) {
+        titleService.claimTitle(titleId);
+        return new ResponseData<>(200, "success", null);
     }
 
 

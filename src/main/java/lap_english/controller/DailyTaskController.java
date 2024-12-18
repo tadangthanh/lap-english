@@ -36,8 +36,9 @@ public class DailyTaskController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping("/claim-reward/{dailyTaskId}")
-    public ResponseData<UserDailyTaskDto> claimed(@PathVariable Long dailyTaskId) {
-      return  new ResponseData<>(HttpStatus.OK.value(), "success", dailyTaskService.claimReward(dailyTaskId));
+    public ResponseData<Void> claimed(@PathVariable Long dailyTaskId) {
+        dailyTaskService.claimReward(dailyTaskId);
+      return  new ResponseData<>(HttpStatus.OK.value(), "success", null);
     }
 
     @Operation(summary = "Tạo mới", description = "Trả về đối tượng vừa tạo ")

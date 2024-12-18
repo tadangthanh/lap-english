@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IDailyTaskService {
-    UserDailyTaskDto claimReward(Long dailyTaskId);
+    void claimReward(Long dailyTaskId);
     DailyTaskDto create(TaskDto taskDto);
     void delete(Long id);
     DailyTaskDto update(TaskDto taskDto);

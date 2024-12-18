@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.List;
 
 public interface ITitleService {
-    UserTitleDto claimTitle(Long titleId);
+    void claimTitle(Long titleId);
     TitleDto create(TitleDto titleDto, MultipartFile file);
     void delete(Long id);
     TitleDto update(TitleDto titleDto,MultipartFile file);

@@ -49,7 +49,7 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
     private final UserTitleRepo userTitleRepo;
 
     @Override
-    public UserDailyTaskDto claimReward(Long dailyTaskId) {
+    public void claimReward(Long dailyTaskId) {
         User user = getCurrentUser();
         // nhiệm vụ của ngày hiện tại
         UserDailyTask userDailyTask = findUserDailyTaskByDailyTaskAndUserIdAndDateNowOrThrow(dailyTaskId, user.getId());
@@ -74,16 +74,16 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
         Reward reward = dailyTask.getReward();
         addRewardToUser(user, reward);
         // tra ve thong tin userDailyTask da nhan thuong
-        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
-        userDailyTaskDto.setUserId(user.getId());
-        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
-        RewardDto rewardDto = rewardMapper.toDto(reward);
-        rewardDto.setRewardClaimed(true);
-        dailyTaskDto.setReward(rewardDto);
-        TaskDto taskDto = taskMapper.toDto(task);
-        dailyTaskDto.setTask(taskDto);
-        userDailyTaskDto.setDailyTask(dailyTaskDto);
-        return userDailyTaskDto;
+//        UserDailyTaskDto userDailyTaskDto = userDailyTaskMapper.toDto(userDailyTask);
+//        userDailyTaskDto.setUserId(user.getId());
+//        DailyTaskDto dailyTaskDto = dailyTaskMapper.toDto(dailyTask);
+//        RewardDto rewardDto = rewardMapper.toDto(reward);
+//        rewardDto.setRewardClaimed(true);
+//        dailyTaskDto.setReward(rewardDto);
+//        TaskDto taskDto = taskMapper.toDto(task);
+//        dailyTaskDto.setTask(taskDto);
+//        userDailyTaskDto.setDailyTask(dailyTaskDto);
+//        return userDailyTaskDto;
     }
 
     private void addRewardToUser(User user, Reward reward) {
