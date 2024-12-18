@@ -5,7 +5,6 @@ import lap_english.dto.request.LoginGoogleRequest;
 import lap_english.dto.response.TokenResponse;
 import lap_english.entity.*;
 import lap_english.exception.ResourceNotFoundException;
-import lap_english.mapper.*;
 import lap_english.repository.*;
 import lap_english.service.IAuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -66,23 +62,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        // moi khi userlogin thi kiem tra xem nhiem vu hang ngay cua user xem co phai la nhiem vu cua ngay cu hayk
-        // neu la nhiem vu cua ngay cu thi xoa di va tao lai nhiem vu moi
-        List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
-        userDailyTasks.forEach(userDailyTask -> {
-            // chuyển đổi ngày tạo task sang kiểu LocalDate
-            Date createdAt = userDailyTask.getCreatedAt();
-            LocalDate taskCreatedDate = createdAt.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-            // Get the current date
-            LocalDate currentDate = LocalDate.now();
-            //  so sánh ngày tạo task với ngày hiện tại ,nếu khác nhau thì xóa task
-            if (!taskCreatedDate.isEqual(currentDate)) {
-                userDailyTaskRepo.deleteAllByDailyTaskId(userDailyTask.getDailyTask().getId());
-            }
-        });
-        generateDailyTask(user);
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
