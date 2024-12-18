@@ -5,6 +5,7 @@ import lap_english.dto.request.LoginGoogleRequest;
 import lap_english.dto.response.TokenResponse;
 import lap_english.entity.*;
 import lap_english.exception.ResourceNotFoundException;
+import lap_english.mapper.*;
 import lap_english.repository.*;
 import lap_english.service.IAuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -62,6 +66,23 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        // moi khi userlogin thi kiem tra xem nhiem vu hang ngay cua user xem co phai la nhiem vu cua ngay cu hayk
+        // neu la nhiem vu cua ngay cu thi xoa di va tao lai nhiem vu moi
+        List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
+        userDailyTasks.forEach(userDailyTask -> {
+            // chuyển đổi ngày tạo task sang kiểu LocalDate
+            Date createdAt = userDailyTask.getCreatedAt();
+            LocalDate taskCreatedDate = createdAt.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            // Get the current date
+            LocalDate currentDate = LocalDate.now();
+            //  so sánh ngày tạo task với ngày hiện tại ,nếu khác nhau thì xóa task
+            if (!taskCreatedDate.isEqual(currentDate)) {
+                userDailyTaskRepo.deleteAllByDailyTaskId(userDailyTask.getDailyTask().getId());
+            }
+        });
+        generateDailyTask(user);
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -100,8 +121,32 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         userRepo.saveAndFlush(user);
         // init title
         List<UserTitle> userTitles = initUserTitleByUser(user);
-        userRepo.saveAndFlush(user);
+        user = userRepo.saveAndFlush(user);
+        generateDailyTask(user);
         return user;
+    }
+
+    private void generateDailyTask(User user) {
+        // danh sach cac task cua ngay cu
+        List<UserDailyTask> userDailyTasksOld = userDailyTaskRepo.findAllByUserId(user.getId());
+        List<Long> idsOldDailyTask = userDailyTasksOld.stream().map(userDailyTask -> userDailyTask.getDailyTask().getId()).toList();
+        // lay cac task moi 1 cach ngau nhien
+        int dailyTaskNum = 3;
+        Pageable pageable = PageRequest.of(0, dailyTaskNum);
+        List<DailyTask> taskRandom = dailyTaskRepo.findRandomDailyTasks(idsOldDailyTask, pageable);
+//        List<UserDailyTask> userDailyTasksNew = new ArrayList<>();
+        for (DailyTask dailyTask : taskRandom) {
+            // init userDaily Task
+            UserDailyTask userDailyTask = new UserDailyTask();
+            userDailyTask.setUser(user);
+            userDailyTask.setDailyTask(dailyTask);
+            userDailyTask.setProgress(0);
+            userDailyTask.setRewardClaimed(false);
+            userDailyTask = userDailyTaskRepo.saveAndFlush(userDailyTask);
+//            userDailyTasksNew.add(userDailyTask);
+        }
+        // xoa cac task cu
+        idsOldDailyTask.forEach(userDailyTaskRepo::deleteAllByDailyTaskId);
     }
 
     private List<UserTitle> initUserTitleByUser(User user) {

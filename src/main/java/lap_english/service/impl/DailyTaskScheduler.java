@@ -66,10 +66,4 @@ public class DailyTaskScheduler {
         idsOldDailyTask.forEach(userDailyTaskRepo::deleteAllByDailyTaskId);
     }
 
-    private User getCurrentUser() {
-        return userRepo.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> {
-            log.error("User not found");
-            return new RuntimeException("User not found");
-        });
-    }
 }
