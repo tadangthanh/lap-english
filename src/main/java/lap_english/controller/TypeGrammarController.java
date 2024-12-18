@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lap_english.dto.TypeGrammarDto;
+import lap_english.dto.response.PageResponse;
 import lap_english.dto.response.ResponseData;
 import lap_english.exception.ErrorObjectDetails;
 import lap_english.service.ITypeGrammarService;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,11 +84,11 @@ public class TypeGrammarController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @GetMapping
-    public ResponseData<?> getAllBySearch(  @Parameter(
+    public ResponseData<PageResponse<List<TypeGrammarDto>>> getAllBySearch(@Parameter(
             description = "số trang, số page,xắp xếp tăng giảm của page cần lấy, page bắt đầu từ 0",
             example = "?page=0&size=10&typeGrammars=name~thi hien tai don&sort=name,desc"
     )Pageable pageable,
-                                            @Parameter(
+                                                           @Parameter(
                                                     description = "danh sách các field cần tìm kiếm ( có thể có nhiều field )",
                                                     example = "name~thi hien tai don, (tức là đang tìm kiếm nam có chứa từ thi hien tai don) "
                                             )
