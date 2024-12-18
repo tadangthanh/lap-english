@@ -2,6 +2,7 @@ package lap_english.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import lap_english.entity.Task;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,5 +17,8 @@ public interface TaskRepo extends JpaRepository<Task,Long>, JpaSpecificationExec
     List<Task> findRandomTasks(Pageable pageable);
     @Query("SELECT t FROM Task t WHERE t.id NOT IN :excludedIds ORDER BY FUNCTION('RAND')")
     List<Task> findRandomTasks(@Param("excludedIds") List<Long> excludedIds, Pageable pageable);
+
+
+    Page<Task>findAllByIdIn(List<Long> ids, Pageable pageable);
 
 }

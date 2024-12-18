@@ -36,7 +36,7 @@ public class DailyTaskController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping("/claim-reward/{dailyTaskId}")
-    public ResponseData<UserDailyTaskDto> create(@PathVariable Long dailyTaskId) {
+    public ResponseData<UserDailyTaskDto> claimed(@PathVariable Long dailyTaskId) {
       return  new ResponseData<>(HttpStatus.OK.value(), "success", dailyTaskService.claimReward(dailyTaskId));
     }
 
@@ -60,9 +60,9 @@ public class DailyTaskController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @DeleteMapping("/{id}")
-    public ResponseData<String> delete(@PathVariable Long id) {
+    public ResponseData<Void> delete(@PathVariable Long id) {
         dailyTaskService.delete(id);
-        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", "Xóa thành công");
+        return new ResponseData<>(HttpStatus.NO_CONTENT.value(), "success", null);
     }
 
     @Operation(summary = "update", description = "Trả về đối tượng vừa update ")
@@ -85,8 +85,8 @@ public class DailyTaskController {
             @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @GetMapping
-    public ResponseData<PageResponse<List<DailyTaskDto>>> getPage(Pageable pageable, @RequestParam(required = false) String[] tasks) {
-        return new ResponseData<>(HttpStatus.OK.value(), "success", dailyTaskService.getAllTask(pageable, tasks));
+    public ResponseData<PageResponse<List<DailyTaskDto>>> getPage(Pageable pageable) {
+        return new ResponseData<>(HttpStatus.OK.value(), "success", dailyTaskService.getAllTask(pageable));
     }
 }
 

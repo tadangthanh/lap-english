@@ -13,5 +13,5 @@ public interface IDailyTaskService {
     DailyTaskDto create(TaskDto taskDto);
     void delete(Long id);
     DailyTaskDto update(TaskDto taskDto);
-    PageResponse<List<DailyTaskDto>> getAllTask(Pageable pageable, String[] tasks);
+    PageResponse<List<DailyTaskDto>> getAllTask(Pageable pageable);
 }

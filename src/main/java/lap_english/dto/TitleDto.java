@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TitleDto{
+public class TitleDto extends  BaseDto{
     private String image;
     private String title;
     private TaskDto task;

@@ -129,6 +129,7 @@ public class SubTopicServiceImpl implements ISubTopicService {
 
         subTopicMapper.updateEntityFromDto(subTopicDto, subTopicExist);
         subTopicExist = subTopicRepo.save(subTopicExist);
+        // kiem tra neu cap nhat main topic thi cap nhat lai main topic
         if (subTopicDto.getMainTopicId() != null && !subTopicExist.getMainTopic().getId().equals(subTopicDto.getMainTopicId())) {
             MainTopic mainTopic = getMainTopicById(subTopicDto.getMainTopicId());
             subTopicExist.setMainTopic(mainTopic);

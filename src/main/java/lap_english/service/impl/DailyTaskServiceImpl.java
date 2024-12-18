@@ -188,20 +188,21 @@ public class DailyTaskServiceImpl implements IDailyTaskService {
     }
 
     @Override
-    public PageResponse<List<DailyTaskDto>> getAllTask(Pageable pageable, String[] tasks) {
-        if (tasks != null && tasks.length > 0) {
-            EntitySpecificationsBuilder<Task> builder = new EntitySpecificationsBuilder<Task>();
-            Pattern pattern = Pattern.compile("(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)"); //?page=0&size=10&sort=id,desc&subtopic=name~d
-            for (String s : tasks) {
-                Matcher matcher = pattern.matcher(s);
-                if (matcher.find()) {
-                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
-                }
-            }
-            Page<Task> taskPage = taskRepo.findAll(builder.build(), pageable);
-            return convertToPageResponse(taskPage, pageable);
-        }
-        return convertToPageResponse(taskRepo.findAll(pageable), pageable);
+    public PageResponse<List<DailyTaskDto>> getAllTask(Pageable pageable) {
+//        if (tasks != null && tasks.length > 0) {
+//            EntitySpecificationsBuilder<Task> builder = new EntitySpecificationsBuilder<Task>();
+//            Pattern pattern = Pattern.compile("(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)"); //?page=0&size=10&sort=id,desc&subtopic=name~d
+//            for (String s : tasks) {
+//                Matcher matcher = pattern.matcher(s);
+//                if (matcher.find()) {
+//                    builder.with(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+//                }
+//            }
+//            Page<Task> taskPage = taskRepo.findAll(builder.build(), pageable);
+//            return convertToPageResponse(taskPage, pageable);
+//        }
+        List<Long> ids = dailyTaskRepo.findAll().stream().map(DailyTask::getTask).map(Task::getId).toList();
+        return convertToPageResponse(taskRepo.findAllByIdIn(ids,pageable), pageable);
     }
 
     private PageResponse<List<DailyTaskDto>> convertToPageResponse(Page<Task> taskPage, Pageable pageable) {
