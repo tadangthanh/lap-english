@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class Grammar extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     @ManyToOne
     @JoinColumn(name = "type_grammar_id")
