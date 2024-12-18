@@ -23,8 +23,8 @@ public class TaskDto extends BaseDto {
     private Double total;
     private Double progress;
     @NotNull(message = "reward is required")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private RewardDto reward;
-    @NotNull(message = "taskFor is required")
-    private TaskFor taskFor;
+//    @NotNull(message = "taskFor is required")
+//    private TaskFor taskFor;
 }
