@@ -65,13 +65,23 @@ public class UserServiceImpl implements IUserService {
         return currentUser.getJson();
     }
 
-    private boolean isDailyTaskOld(UserDailyTask userDailyTask) {
-        Date createdAt = userDailyTask.getCreatedAt();
-        LocalDate taskCreatedDate = createdAt.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate currentDate = LocalDate.now();
-        return !taskCreatedDate.isEqual(currentDate);
+    private boolean isDailyTaskOld() {
+        boolean isOld = false;
+        User user = getCurrentUser();
+        List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
+        for(UserDailyTask u : userDailyTasks) {
+            // neu la nhiem vu cua ngay cu thi xoa di
+            Date createdAt = u.getCreatedAt();
+            LocalDate taskCreatedDate = createdAt.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            LocalDate currentDate = LocalDate.now();
+            if (!taskCreatedDate.isEqual(currentDate)) {
+                isOld = true;
+                break;
+            }
+        }
+        return isOld;
     }
 
     @Override
@@ -80,15 +90,10 @@ public class UserServiceImpl implements IUserService {
 
         // moi khi userlogin thi kiem tra xem nhiem vu hang ngay cua user xem co phai la nhiem vu cua ngay cu hayk
         // neu la nhiem vu cua ngay cu thi xoa di va tao lai nhiem vu moi
-        List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
-        userDailyTasks.forEach(userDailyTask -> {
-            // neu la nhiem vu cua ngay cu thi xoa di
-            if (isDailyTaskOld(userDailyTask)) {
-                userDailyTaskRepo.deleteAllByDailyTaskId(userDailyTask.getDailyTask().getId());
-            }
-        });
         // tạo lại nhiệm vụ hàng ngày cho user
-        generateDailyTask(user);
+        if(isDailyTaskOld()) {
+            generateDailyTask(user);
+        }
 
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setId(user.getId());
@@ -106,8 +111,7 @@ public class UserServiceImpl implements IUserService {
             CumulativePointDto pointDto = cumulativePointMapper.toDto(cumulativePoint);
             userResponseDto.setCumulativePoint(pointDto);
         }
-        userDailyTasks.clear();
-        userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
+        List<UserDailyTask>userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
         List<DailyTaskDto> dailyTaskDtoList = new ArrayList<>();
         // set dailytask dto
         userDailyTasks.forEach(userDailyTask -> {
