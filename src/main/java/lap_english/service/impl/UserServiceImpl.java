@@ -69,6 +69,9 @@ public class UserServiceImpl implements IUserService {
         boolean isOld = false;
         User user = getCurrentUser();
         List<UserDailyTask> userDailyTasks = userDailyTaskRepo.findAllByUserId(user.getId());
+        if(userDailyTasks.isEmpty()) {
+            return true;
+        }
         for(UserDailyTask u : userDailyTasks) {
             // neu la nhiem vu cua ngay cu thi xoa di
             Date createdAt = u.getCreatedAt();
