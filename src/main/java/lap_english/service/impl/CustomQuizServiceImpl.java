@@ -1,8 +1,9 @@
 package lap_english.service.impl;
 
 import jakarta.transaction.Transactional;
-import lap_english.dto.response.CustomQuizResponse;
 import lap_english.dto.request.CustomQuizRequest;
+import lap_english.dto.response.CustomQuizResponse;
+import lap_english.dto.response.PageResponse;
 import lap_english.entity.CustomQuiz;
 import lap_english.entity.ExerciseGrammar;
 import lap_english.exception.ResourceNotFoundException;
@@ -14,9 +15,13 @@ import lap_english.service.ICustomQuizService;
 import lap_english.service.IQuizAnswerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -34,9 +39,9 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
     public CustomQuizResponse save(CustomQuizRequest customQuizRequest) {
         CustomQuiz customQuiz = customQuizMapper.requestToEntity(customQuizRequest);
         // tìm bài tập mà custom quiz thuộc về
-        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(customQuizRequest.getExerciseGrammarId());
-        customQuiz.setExerciseGrammar(exerciseGrammar);
-        exerciseGrammar.setCustomQuiz(customQuiz);
+//        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(customQuizRequest.getExerciseGrammarId());
+//        customQuiz.setExerciseGrammar(exerciseGrammar);
+//        exerciseGrammar.setCustomQuiz(customQuiz);
         // lưu custom quiz
         customQuiz = customQuizRepo.saveAndFlush(customQuiz);
         // lưu các đáp án
@@ -84,6 +89,11 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
     }
 
     @Override
+    public CustomQuizResponse getById(Long id) {
+        return customQuizMapper.entityToResponse(findCustomQuizById(id));
+    }
+
+    @Override
     public void delete(Long id) {
         CustomQuiz customQuiz = findCustomQuizById(id);
         String imageQuestion = customQuiz.getImageQuestion();
@@ -105,22 +115,30 @@ public class CustomQuizServiceImpl implements ICustomQuizService {
 
     @Override
     public CustomQuizResponse getByExerciseGrammarId(Long exerciseGrammarId) {
-        CustomQuiz customQuizPage = findCustomQuizByExerciseGrammarId(exerciseGrammarId);
-        return customQuizMapper.entityToResponse(customQuizPage);
+        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(exerciseGrammarId);
+        return customQuizMapper.entityToResponse(exerciseGrammar.getCustomQuiz());
     }
 
-    private CustomQuiz findCustomQuizByExerciseGrammarId(Long id) {
-        return customQuizRepo.findByExerciseGrammarId(id).orElseThrow(() -> {
-            log.warn("Custom Quiz not found with exercise grammar id: {}", id);
-            return new ResourceNotFoundException("Custom Quiz not found with exercise grammar id: " + id);
-        });
-    }
 
     @Override
     public void deleteByExerciseGrammarId(Long exerciseGrammarId) {
-        CustomQuiz customQuiz = findCustomQuizByExerciseGrammarId(exerciseGrammarId);
+        ExerciseGrammar exerciseGrammar = findExerciseGrammarById(exerciseGrammarId);
+        CustomQuiz customQuiz = exerciseGrammar.getCustomQuiz();
+        if (customQuiz == null) {
+            log.warn("Custom Quiz not found with exercise grammar id: {}", exerciseGrammarId);
+            throw new ResourceNotFoundException("Custom Quiz not found with exercise grammar id: " + exerciseGrammarId);
+        }
         quizAnswerService.deleteByCustomQuizId(customQuiz.getId());
         delete(customQuiz.getId());
+    }
+
+    @Override
+    public PageResponse<List<CustomQuizResponse>> getPage(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<CustomQuiz> customQuizPage = customQuizRepo.findAll(pageRequest);
+        List<CustomQuizResponse> customQuizResponses = customQuizMapper.entitiesToResponses(customQuizPage.getContent());
+        return PageResponse.<List<CustomQuizResponse>>builder().items(customQuizResponses).totalItems(customQuizPage.getTotalElements()).totalPage(customQuizPage.getTotalPages()).hasNext(customQuizPage.hasNext()).pageNo(pageRequest.getPageNumber()).pageSize(pageRequest.getPageSize()).build();
+
     }
 
     private CustomQuiz findCustomQuizById(Long id) {

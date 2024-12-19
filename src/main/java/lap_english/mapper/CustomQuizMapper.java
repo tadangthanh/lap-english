@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = IGNORE)
@@ -23,4 +25,5 @@ public interface CustomQuizMapper {
     @Mapping(target = "quizAnswers", ignore = true)
     void updateFromRequest(CustomQuizRequest customQuizRequest, @MappingTarget CustomQuiz customQuiz);
 
+    List<CustomQuizResponse> entitiesToResponses(List<CustomQuiz> customQuizzes);
 }

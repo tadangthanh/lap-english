@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface CustomQuizRepo extends JpaRepository<CustomQuiz, Long> {
-   Optional<CustomQuiz> findByExerciseGrammarId(Long exerciseGrammarId);
+//   Optional<CustomQuiz> findByExerciseGrammarId(Long exerciseGrammarId);
 
 }

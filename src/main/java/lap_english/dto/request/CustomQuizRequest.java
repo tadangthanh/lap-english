@@ -26,8 +26,8 @@ public class CustomQuizRequest extends BaseDto {
     @NotBlank(message = "Question is required", groups = {Create.class, Update.class})
     private String question;
     private MultipartFile imageQuestion;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Long exerciseGrammarId;
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    private Long exerciseGrammarId;
     @Valid
     private List<QuizAnswerRequest> quizAnswers;
 }

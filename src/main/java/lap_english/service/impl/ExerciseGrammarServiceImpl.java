@@ -68,24 +68,24 @@ public class ExerciseGrammarServiceImpl implements IExerciseGrammarService {
         exerciseGrammar = exerciseGrammarRepo.saveAndFlush(exerciseGrammar);
         // lưu custom quizRequest
         exerciseGrammarRequest.setId(exerciseGrammar.getId());
-        CustomQuizResponse customQuizResponse = saveCustomQuizRequestByExerciseGrammarRequest(exerciseGrammarRequest);
+//        CustomQuizResponse customQuizResponse = saveCustomQuizRequestByExerciseGrammarRequest(exerciseGrammarRequest);
         // luu va set customQuiz cho bai tap vua luu de tra ve cho client
         ExerciseGrammarResponse exerciseGrammarResponse = exerciseGrammarMapper.entityToResponse(exerciseGrammar);
-        exerciseGrammarResponse.setCustomQuiz(customQuizResponse);
+//        exerciseGrammarResponse.setCustomQuiz(customQuizResponse);
         return exerciseGrammarResponse;
     }
 
-    private CustomQuizResponse saveCustomQuizRequestByExerciseGrammarRequest(ExerciseGrammarRequest exerciseGrammarRequest) {
-        // lưu câu hỏi quiz
-        CustomQuizRequest customQuizRequest = exerciseGrammarRequest.getCustomQuiz();
-        customQuizRequest.setExerciseGrammarId(exerciseGrammarRequest.getId());
-        CustomQuizResponse customQuizResponse = customQuizService.save(customQuizRequest);
-        // lấy danh sách các câu trả lời của câu hỏi
-        List<QuizAnswerResponse> quizAnswerResponses = quizAnswerService.getByQuizCustomId(customQuizResponse.getId());
-        // set danh sách câu trả lời cho câu hỏi
-        customQuizResponse.setQuizAnswers(quizAnswerResponses);
-        return customQuizResponse;
-    }
+//    private CustomQuizResponse saveCustomQuizRequestByExerciseGrammarRequest(ExerciseGrammarRequest exerciseGrammarRequest) {
+//        // lưu câu hỏi quiz
+//        CustomQuizRequest customQuizRequest = exerciseGrammarRequest.getCustomQuiz();
+//        customQuizRequest.setExerciseGrammarId(exerciseGrammarRequest.getId());
+//        CustomQuizResponse customQuizResponse = customQuizService.save(customQuizRequest);
+//        // lấy danh sách các câu trả lời của câu hỏi
+//        List<QuizAnswerResponse> quizAnswerResponses = quizAnswerService.getByQuizCustomId(customQuizResponse.getId());
+//        // set danh sách câu trả lời cho câu hỏi
+//        customQuizResponse.setQuizAnswers(quizAnswerResponses);
+//        return customQuizResponse;
+//    }
 
     @Override
     public PageResponse<List<ExerciseGrammarResponse>> getByGrammaticalStructureId(Long grammaticalStructureId, Integer page, Integer size) {

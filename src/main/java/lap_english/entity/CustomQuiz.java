@@ -22,6 +22,6 @@ public class CustomQuiz extends BaseEntity {
     // danh sách các câu trả lời của bài quiz này
     @OneToMany(mappedBy = "customQuiz")
     private List<QuizAnswer> quizAnswers;
-    @OneToOne(mappedBy = "customQuiz")
-    private ExerciseGrammar exerciseGrammar;
+//    @OneToOne(mappedBy = "customQuiz")
+//    private ExerciseGrammar exerciseGrammar;
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lap_english.dto.request.CustomQuizRequest;
 import lap_english.dto.response.CustomQuizResponse;
+import lap_english.dto.response.PageResponse;
 import lap_english.dto.response.ResponseData;
 import lap_english.exception.ErrorObjectDetails;
 import lap_english.service.ICustomQuizService;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/custom-quiz")
@@ -56,7 +59,7 @@ public class CustomQuizController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy đối tượng liên quan "),
             @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
     @PostMapping
-    public ResponseData<CustomQuizResponse> create(@Validated(Create.class) @RequestBody CustomQuizRequest customQuizRequest) {
+    public ResponseData<CustomQuizResponse> create(@Validated(Create.class) @ModelAttribute  CustomQuizRequest customQuizRequest) {
         return new ResponseData<>(HttpStatus.CREATED.value(), "success", customQuizService.save(customQuizRequest));
     }
 
@@ -74,5 +77,31 @@ public class CustomQuizController {
     }
 
 
+    @Operation(summary = "lấy page quiz ", description = "Trả về danh sách  quiz theo page")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Thành công, trả về 1 page các đối tượng "),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping
+    public ResponseData<PageResponse<List<CustomQuizResponse>>> getPage(@RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "10") int size) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", customQuizService.getPage(page, size));
+    }
+
+
+
+    @Operation(summary = "lấy page theo id ", description = "Trả về  quiz theo")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Thành công, trả về 1 page các đối tượng "),
+            @ApiResponse(responseCode = "400", description = "Bad Request: Lỗi validation dữ liệu truyền vào",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorObjectDetails.class))),
+            @ApiResponse(responseCode = "404", description = "không tìm thấy đối tượng liên quan"),
+            @ApiResponse(responseCode = "500", description = "Lỗi server nội bộ.")})
+    @GetMapping("/{id}")
+    public ResponseData<CustomQuizResponse> getById(@PathVariable("id") Long id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get main topic successfully", customQuizService.getById(id));
+    }
 
 }
